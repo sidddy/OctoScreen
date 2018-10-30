@@ -48,9 +48,6 @@
 #ifndef UTFT_h
 #define UTFT_h
 
-//#include "mks_conf.h"
-#include "Print.h"
-
 #define DISPLAY_X 240
 #define DISPLAY_Y 320
 
@@ -89,152 +86,29 @@
 #define ST7789_RDID4   0xDD
 
 
-
-#define LCD_DCX_Pin LCD_RS_Pin
-#define LCD_DCX_GPIO_Port LCD_RS_GPIO_Port
-
-
-
-
-typedef uint16_t PixelNumber;
-
-enum DisplayOrientation {
-	Default = 0x00,
-	SwapXY = 0x01,
-	ReverseX = 0x02,
-	ReverseY = 0x04,
-
-	Landscape = SwapXY | ReverseY
-};
-
-// This describes the structure we use to store font information.
-// The first 5 fields are also the layout of the data in the font header.
-class FontDescriptor
-{
-private:
-    const uint8_t *font;
-
-public:
-
-    FontDescriptor() : font(nullptr) {}
-	inline void setFont(const uint8_t * f) {
-	    font = f;
-	}
-
-	inline uint8_t xSize() const  { return font ? *font : 0; }
-	inline uint8_t ySize() const  { return font ? *(font + 1) : 0; }
-	static inline uint8_t ySize(const uint8_t * f) { return *(f + 1); }
-	inline uint8_t spaces() const { return font ? *(font + 2) : 0; }
-	inline uint8_t ranges() const { return font ? *(font + 3) : 0; }
-
-	inline bool inRange(uint32_t c) const {
-
-	    if (!font) return false;
-
-	    uint32_t *firstChar = (uint32_t *) (font + 4);
-	    uint32_t *lastChar  = firstChar + 1;
-
-	    for (uint8_t rangesLeft = ranges(); rangesLeft; rangesLeft--, firstChar+=2, lastChar+=2) {
-            if ( c >= *firstChar && c <= *lastChar)
-                return true;
-	    }
-
-	    return false;
-	}
-
-	inline uint8_t bytesPerColumn() const {
-	    return (ySize() + 7) / 8;
-	}
-
-    inline uint8_t bytesPerChar() const {
-        return bytesPerColumn() * xSize() + 1;
-    }
-
-    inline const uint8_t *fontPtr(uint32_t c) const {
-
-	    if (!font) return nullptr;
-
-        const uint8_t* fPtr = font + 4 + (ranges() * 8);
-	    uint32_t *firstChar = (uint32_t *) (font + 4);
-	    uint32_t *lastChar  = firstChar + 1;
-
-	    for (uint8_t rangesLeft = ranges(); rangesLeft; rangesLeft--, firstChar+=2, lastChar+=2) {
-
-            if ( c >= *firstChar && c <= *lastChar)
-                return fPtr + (bytesPerChar() * (c - *firstChar));
-
-            fPtr += bytesPerChar() * (*lastChar - *firstChar + 1);
-	    }
-
-	    return nullptr;
-    }
-};
-
 typedef uint16_t Colour;
-typedef const uint16_t *Palette;
 
-class UTFT : public Print
+
+class UTFT
 {
 public:
-	void InitLCD(DisplayOrientation po);
+	void InitLCD();
 	void fillScr(Colour c, uint16_t leftMargin = 0);
-	void drawPixel(int x, int y);
-	void drawLine(int x1, int y1, int x2, int y2);
-	void drawRect(int x1, int y1, int x2, int y2);
-	void drawRoundRect(int x1, int y1, int x2, int y2);
-	void fillRect(int x1, int y1, int x2, int y2, Colour grad = 0, uint8_t gradChange = 1);
-	void fillRoundRect(int x1, int y1, int x2, int y2, Colour grad = 0, uint8_t gradChange = 1);
-	void drawCircle(int x, int y, int radius);
-	void fillCircle(int x, int y, int radius);
 
 	// Colour management. We store colours in native 16-bit format, but support conversion from RGB.
 	void setColor(Colour c) { fcolour = c; }
-	void setBackColor(Colour c) { bcolour = c; }
-	void setTransparentBackground(bool b) { transparentBackground = b; }
+
 	static constexpr Colour fromRGB(uint8_t r, uint8_t g, uint8_t b);
 
-	// New print functions
-	// Set up translation for characters. Useful for translating fullstop into decimal point, or changing the width of spaces.
-	// Either the first string passed must be NULL, or the two strings must have equal lengths as returned by strlen().
-	void setTranslation(const char *tFrom, const char *tTo);
-	size_t write(uint8_t c) override;
-	void setTextPos(uint16_t x, uint16_t y, uint16_t rm = 9999);
-	void clearToMargin();
-	size_t print(const char *s, uint16_t x, uint16_t y, uint16_t rm = 9999);
-	using Print::print;
-
-	void setFont(const uint8_t* font);
-	void drawBitmap16(int x, int y, int sx, int sy, const uint16_t *data, int scale = 1, bool byCols = true);
-    void drawBitmap4(int x, int y, int sx, int sy, const uint8_t *data, Palette palette, int scale = 1, bool byCols = true);
     void displayFlush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const uint16_t * data);
 
-	void drawCompressedBitmap(int x, int y, int sx, int sy, const uint16_t *data);
-	void drawCompressedBitmapBottomToTop(int x, int y, int sx, int sy, const uint16_t *data);
-	inline uint16_t getDisplayXSize() const { return (orient & DisplayOrientation::SwapXY) ? DISPLAY_X : DISPLAY_Y; }
-	inline uint16_t getDisplayYSize() const { return (orient & DisplayOrientation::SwapXY) ? DISPLAY_Y : DISPLAY_X; }
-	uint16_t getTextX() const { return textXpos; }
-	uint16_t getTextY() const { return textYpos; }
-	uint16_t getFontHeight() const { return cfont.ySize(); }
-    static uint16_t GetFontHeight(const uint8_t *f) { return FontDescriptor::ySize(f); }
-    uint16_t LCD_Read_REG(uint8_t reg);
+	inline uint16_t getDisplayXSize() const { return DISPLAY_X; }
+	inline uint16_t getDisplayYSize() const { return DISPLAY_Y; }
+
 
 private:
 	uint16_t fcolour, bcolour;
-	bool transparentBackground;
-	DisplayOrientation orient;
-	uint16_t disp_x_size, disp_y_size;
 
-	FontDescriptor cfont;
-	uint16_t textXpos, textYpos, textRightMargin;
-	uint32_t lastCharColData;		// used for auto kerning
-	const char* translateFrom;
-	const char* translateTo;
-
-	uint32_t charVal;
-	uint8_t numContinuationBytesLeft;
-
-	size_t writeNative(uint32_t c);
-	void applyGradient(uint16_t grad);
 
 	// Hardware interface
 	void LCD_Write_Bus(uint16_t VHL);
@@ -256,9 +130,6 @@ private:
 
 	void delay(int ms);
 
-
-	void drawHLine(int x, int y, int len);
-	void drawVLine(int x, int y, int len);
 	void setXY(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 };
 
@@ -291,56 +162,7 @@ const Colour
 	lightBlue = UTFT::fromRGB(180, 180, 255),
 	darkBlue = UTFT::fromRGB(0, 0, 64);
 
-// Definition of a colour scheme
-struct ColourScheme
-{
-	size_t index;
-	Palette pal;
 
-	Colour titleBarTextColour;
-	Colour titleBarBackColour;
-	Colour labelTextColour;
-	Colour infoTextColour;
-	Colour infoBackColour;
-	Colour defaultBackColour;
-	Colour activeBackColour;
-	Colour standbyBackColour;
-	Colour tuningBackColour;
-	Colour errorTextColour;
-	Colour errorBackColour;
 
-	Colour popupBorderColour;
-	Colour popupBackColour;
-	Colour popupTextColour;
-	Colour popupButtonTextColour;
-	Colour popupButtonBackColour;
-	Colour popupInfoTextColour;
-	Colour popupInfoBackColour;
-
-	Colour alertPopupBackColour;
-	Colour alertPopupTextColour;
-
-	Colour buttonTextColour;
-	Colour buttonPressedTextColour;
-	Colour buttonTextBackColour;
-	Colour buttonImageBackColour;
-	Colour buttonGradColour;
-	Colour buttonPressedBackColour;
-	Colour buttonPressedGradColour;
-	Colour buttonBorderColour;
-	Colour homedButtonBackColour;
-	Colour notHomedButtonBackColour;
-	Colour pauseButtonBackColour;
-	Colour resumeButtonBackColour;
-	Colour resetButtonBackColour;
-
-	Colour progressBarColour;
-	Colour progressBarBackColour;
-
-	Colour stopButtonTextColour;
-	Colour stopButtonBackColour;
-};
-
-extern const ColourScheme colourSchemes[];
 
 #endif

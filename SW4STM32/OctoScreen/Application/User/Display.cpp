@@ -20,7 +20,7 @@ UTFT lcd;
 
 extern "C" {
 	void initDisplay() {
-		lcd.InitLCD(Default);									// set up the LCD
+		lcd.InitLCD();									// set up the LCD
 		lcd.fillScr(0x8800, 0);
 		uint16_t *buf;
 		buf = (uint16_t*)pvPortMalloc(640*sizeof(uint16_t));
