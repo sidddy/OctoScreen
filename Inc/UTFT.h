@@ -48,8 +48,9 @@
 #ifndef UTFT_h
 #define UTFT_h
 
-#define DISPLAY_X 240
-#define DISPLAY_Y 320
+#define DISPLAY_X 320
+#define DISPLAY_Y 240
+#define DISPLAY_PIXELS 64000
 
 #define ST7789_NOP     0x00
 #define ST7789_SWRESET 0x01
@@ -88,81 +89,26 @@
 
 typedef uint16_t Colour;
 
+void LCD_Init();
+void LCD_Fill_Scr(Colour c);
+void LCD_Display_Flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const uint16_t * data);
 
-class UTFT
-{
-public:
-	void InitLCD();
-	void fillScr(Colour c, uint16_t leftMargin = 0);
+// Hardware interface
+void LCD_Write_Bus(uint16_t VHL);
+void LCD_Write_Again(uint16_t num);
+void _set_direction_registers();
 
-	// Colour management. We store colours in native 16-bit format, but support conversion from RGB.
-	void setColor(Colour c) { fcolour = c; }
+// Low level interface
+void LCD_Write_COM(uint8_t VL);
+void LCD_Write_DATA8(uint8_t VL);
+void LCD_Write_DATA16(uint16_t VHL);
+void LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num);
+void LCD_Write_COM_DATA16(uint8_t com1, uint16_t dat1);
+void LCD_Write_COM_DATA8(uint8_t com1, uint8_t dat1);
+void LCD_Write_COM_DATA(uint8_t com1, uint16_t dat1);
+uint8_t LCD_Cmd_Read8(uint8_t cmd);
 
-	static constexpr Colour fromRGB(uint8_t r, uint8_t g, uint8_t b);
-
-    void displayFlush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const uint16_t * data);
-
-	inline uint16_t getDisplayXSize() const { return DISPLAY_X; }
-	inline uint16_t getDisplayYSize() const { return DISPLAY_Y; }
-
-
-private:
-	uint16_t fcolour, bcolour;
-
-
-	// Hardware interface
-	void LCD_Write_Bus(uint16_t VHL);
-	void LCD_Write_Again(uint16_t num);
-	void _set_direction_registers();
-
-	// Low level interface
-	void LCD_Write_COM(uint8_t VL);
-	void LCD_Write_DATA8(uint8_t VL);
-	void LCD_Write_DATA16(uint16_t VHL);
-	void LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num);
-	void LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num1, uint16_t num2);
-	void LCD_Write_COM_DATA16(uint8_t com1, uint16_t dat1);
-	void LCD_Write_COM_DATA8(uint8_t com1, uint8_t dat1);
-	void LCD_Write_COM_DATA(uint8_t com1, uint16_t dat1);
-	void LCD_Write_DATA(uint8_t VH, uint8_t VL);
-	void LCD_Write_DATA(int v);
-	uint8_t LCD_Cmd_Read8(uint8_t cmd);
-
-	void delay(int ms);
-
-	void setXY(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
-};
-
-inline constexpr uint16_t UTFT::fromRGB(uint8_t r, uint8_t g, uint8_t b)
-{
-	return ((r & 248) << 8) | ((g & 252) << 3) | (b >> 3);
-}
-
-// Some common colours
-const Colour
-	white = 0xFFFF,
-	black = 0x0000,
-	lightGrey = UTFT::fromRGB(180, 180, 180),
-	grey = UTFT::fromRGB(128, 128, 128),
-	red = UTFT::fromRGB(255,0,0),
-	lightRed =  UTFT::fromRGB(255, 128, 128),
-	darkRed = UTFT::fromRGB(128, 0, 0),
-	yellow = UTFT::fromRGB(128,128,0),
-	lightYellow = UTFT::fromRGB(255, 255, 128),
-	darkYellow = UTFT::fromRGB(64, 64, 0),
-	lightOrange = UTFT::fromRGB(255, 224, 192),
-	darkOrange = UTFT::fromRGB(128, 64, 0),
-	green = UTFT::fromRGB(0,255,0),
-	lightGreen = UTFT::fromRGB(180, 255, 180),
-	midGreen =  UTFT::fromRGB(0, 160, 0),
-	darkGreen = UTFT::fromRGB(0, 96, 0),
-	turquoise = UTFT::fromRGB(0,128,128),
-	blue = UTFT::fromRGB(0,0,255),
-	magenta = UTFT::fromRGB(128,0,128),
-	lightBlue = UTFT::fromRGB(180, 180, 255),
-	darkBlue = UTFT::fromRGB(0, 0, 64);
-
-
+void LCD_Set_XY(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 
 
 #endif

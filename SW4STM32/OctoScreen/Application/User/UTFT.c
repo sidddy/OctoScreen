@@ -48,8 +48,9 @@
 #include "stm32f1xx_hal.h"
 
 #include "UTFT.h"
+#include "cmsis_os.h"
 
-uint8_t UTFT::LCD_Cmd_Read8(uint8_t cmd) {
+uint8_t LCD_Cmd_Read8(uint8_t cmd) {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
 	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_RESET);
@@ -76,7 +77,7 @@ uint8_t UTFT::LCD_Cmd_Read8(uint8_t cmd) {
 	uint16_t val = GPIOE->IDR; // dummy read
 
 	HAL_GPIO_WritePin(LCD_nRD_GPIO_Port, LCD_nRD_Pin, GPIO_PIN_SET);
-	delay(1);
+	osDelay(1);
 
 	HAL_GPIO_WritePin(LCD_nRD_GPIO_Port, LCD_nRD_Pin, GPIO_PIN_RESET);
 
@@ -97,7 +98,7 @@ uint8_t UTFT::LCD_Cmd_Read8(uint8_t cmd) {
 	return (uint8_t) val;
 }
 
-inline void UTFT::LCD_Write_COM(uint8_t VL)
+inline void LCD_Write_COM(uint8_t VL)
 {
 	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_RESET);
 
@@ -106,16 +107,7 @@ inline void UTFT::LCD_Write_COM(uint8_t VL)
     GPIOB->BSRR = LCD_nWR_Pin;
 }
 
-void UTFT::LCD_Write_DATA(uint8_t VH, uint8_t VL) {
-	uint16_t VHL = (uint16_t)VH*256 + VL;
-	LCD_Write_DATA16(VHL);
-}
-
-void UTFT::LCD_Write_DATA(int v) {
-	LCD_Write_DATA16(v);
-}
-
-inline void UTFT::LCD_Write_DATA16(uint16_t VHL)
+inline void LCD_Write_DATA16(uint16_t VHL)
 {
 	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);
 
@@ -124,7 +116,7 @@ inline void UTFT::LCD_Write_DATA16(uint16_t VHL)
     GPIOB->BSRR = LCD_nWR_Pin;
 }
 
-inline void UTFT::LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num)
+inline void LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num)
 {
 	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);
 
@@ -137,46 +129,31 @@ inline void UTFT::LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num)
 	}
 }
 
-// Write the data num1 * num2 times, where num1 >= 1
-void UTFT::LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num1, uint16_t num2)
-{
-	while (num2 != 0)
-	{
-		LCD_Write_Repeated_DATA16(VHL, num1);
-		--num2;
-	}
-}
-
 // This one is deliberately not inlined to avoid bloating the initialization code.
 // Use LCD_Write_DATA16 instead where high performance is wanted.
-void UTFT::LCD_Write_DATA8(uint8_t VL)
+void LCD_Write_DATA8(uint8_t VL)
 {
 	LCD_Write_DATA16((uint16_t)VL);
 }
 
-void UTFT::LCD_Write_COM_DATA(uint8_t com1, uint16_t dat1) {
+void LCD_Write_COM_DATA(uint8_t com1, uint16_t dat1) {
 	LCD_Write_COM_DATA16(com1, dat1);
 }
 
-void UTFT::LCD_Write_COM_DATA16(uint8_t com1, uint16_t dat1)
+void LCD_Write_COM_DATA16(uint8_t com1, uint16_t dat1)
 {
      LCD_Write_COM(com1);
      LCD_Write_DATA16(dat1);
 }
 
-void UTFT::LCD_Write_COM_DATA8(uint8_t com1, uint8_t dat1)
+void LCD_Write_COM_DATA8(uint8_t com1, uint8_t dat1)
 {
      LCD_Write_COM(com1);
      LCD_Write_DATA8(dat1);
 }
 
-void UTFT::delay(int ms) {
-	HAL_Delay(ms);
-}
-
-void UTFT::InitLCD()
+void LCD_Init()
 {
-
 	uint8_t id = LCD_Cmd_Read8(0xDC);
 
 	if (id != 0x52)
@@ -213,7 +190,7 @@ void UTFT::InitLCD()
 
 }
 
-void UTFT::setXY(uint16_t p_x1, uint16_t p_y1, uint16_t p_x2, uint16_t p_y2)
+void LCD_Set_XY(uint16_t p_x1, uint16_t p_y1, uint16_t p_x2, uint16_t p_y2)
 {
 	uint16_t x1, x2, y1, y2;
 
@@ -236,23 +213,23 @@ void UTFT::setXY(uint16_t p_x1, uint16_t p_y1, uint16_t p_x2, uint16_t p_y2)
 
 }
 
-void UTFT::fillScr(Colour c, uint16_t leftMargin)
+void LCD_Fill_Scr(Colour c)
 {
 	HAL_GPIO_WritePin(LCD_nCS_GPIO_Port, LCD_nCS_Pin, GPIO_PIN_RESET);
 
-	setXY(leftMargin, 0, getDisplayXSize() - 1, getDisplayYSize() - 1);
+	LCD_Set_XY(0, 0, DISPLAY_X - 1, DISPLAY_Y - 1);
 
-	LCD_Write_Repeated_DATA16(c, getDisplayXSize() - leftMargin, getDisplayYSize());
+	LCD_Write_Repeated_DATA16(c, DISPLAY_PIXELS);
 
 	HAL_GPIO_WritePin(LCD_nCS_GPIO_Port, LCD_nCS_Pin, GPIO_PIN_SET);
 }
 
 
-void UTFT::displayFlush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const uint16_t * data)
+void LCD_Display_Flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const uint16_t * data)
 {
 	HAL_GPIO_WritePin(LCD_nCS_GPIO_Port, LCD_nCS_Pin, GPIO_PIN_RESET);
 
-	setXY(x1,y1,x2,y2);
+	LCD_Set_XY(x1,y1,x2,y2);
 	int size = (x2-x1+1)*(y2-y1+1);
 	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);
 
@@ -264,4 +241,3 @@ void UTFT::displayFlush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const ui
 
 	HAL_GPIO_WritePin(LCD_nCS_GPIO_Port, LCD_nCS_Pin, GPIO_PIN_SET);
 }
-
