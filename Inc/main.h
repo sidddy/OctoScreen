@@ -61,6 +61,8 @@
 
 #define SPEAKER_Pin GPIO_PIN_2
 #define SPEAKER_GPIO_Port GPIOA
+#define TOUCH_DI_Pin GPIO_PIN_5
+#define TOUCH_DI_GPIO_Port GPIOC
 #define LCD_nWR_Pin GPIO_PIN_14
 #define LCD_nWR_GPIO_Port GPIOB
 #define LCD_RS_Pin GPIO_PIN_13
@@ -71,6 +73,8 @@
 #define LCD_nRD_GPIO_Port GPIOD
 #define LCD_nCS_Pin GPIO_PIN_8
 #define LCD_nCS_GPIO_Port GPIOC
+#define TOUCH_nCS_Pin GPIO_PIN_9
+#define TOUCH_nCS_GPIO_Port GPIOC
 
 /* ########################## Assert Selection ############################## */
 /**

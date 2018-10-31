@@ -55,6 +55,7 @@
 /* USER CODE BEGIN Includes */
 #include "Display.h"
 #include "lvgl/lvgl.h"
+#include "UTouch.h"
 
 /* USER CODE END Includes */
 
@@ -189,12 +190,12 @@ void SystemClock_Config(void)
     */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV4;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV5;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.Prediv1Source = RCC_PREDIV1_SOURCE_PLL2;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL5;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   RCC_OscInitStruct.PLL2.PLL2State = RCC_PLL2_ON;
   RCC_OscInitStruct.PLL2.PLL2MUL = RCC_PLL2_MUL10;
   RCC_OscInitStruct.PLL2.HSEPrediv2Value = RCC_HSE_PREDIV2_DIV2;
@@ -208,7 +209,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
@@ -296,9 +297,9 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5 
@@ -322,7 +323,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LCD_nCS_GPIO_Port, LCD_nCS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(TOUCH_nCS_GPIO_Port, TOUCH_nCS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
@@ -347,6 +348,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(SPEAKER_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : TOUCH_DI_Pin */
+  GPIO_InitStruct.Pin = TOUCH_DI_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(TOUCH_DI_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : LCD_nWR_Pin */
   GPIO_InitStruct.Pin = LCD_nWR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -368,18 +375,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LCD_nCS_Pin */
-  GPIO_InitStruct.Pin = LCD_nCS_Pin;
+  /*Configure GPIO pins : LCD_nCS_Pin TOUCH_nCS_Pin */
+  GPIO_InitStruct.Pin = LCD_nCS_Pin|TOUCH_nCS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(LCD_nCS_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PC9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_9;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB9 */
@@ -410,8 +410,9 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN 5 */
   osDelay(1000);
   initDisplay();
+  Touch_Init(320,240);
   lv_init();
-  bing();
+ // bing();
 
   lv_disp_drv_t disp_drv;
   lv_disp_drv_init(&disp_drv);           /*Basic initialization*/
@@ -442,9 +443,13 @@ void StartDefaultTask(void const * argument)
 		  lv_task_handler();
 		  cnt = 0;
 	  }
-	  if (cnt2 == 5000) {
-		//  bing();
+	  if (cnt2 == 10000) {
+		  bing();
 		  cnt2 = 0;
+	  }
+	  uint16_t x,y;
+	  if (Touch_Get_Data(true, NULL)) {
+		 bing();
 	  }
 
   }
