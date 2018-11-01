@@ -6,7 +6,7 @@
 
 void Touch_Init(uint16_t xp, uint16_t yp);
 
-bool Touch_Read(uint16_t* x, uint16_t* y, uint16_t* rawX , uint16_t* rawY);
+//bool Touch_Read(uint16_t* x, uint16_t* y, uint16_t* rawX , uint16_t* rawY);
 
 
 /*void Touch_Calibrate(uint16_t xlow, uint16_t xhigh, uint16_t ylow, uint16_t yhigh, uint16_t margin);
@@ -17,7 +17,7 @@ void adjustOrientation(DisplayOrientation a) { orientAdjust = (DisplayOrientatio
 	uint16_t scaleX, scaleY;
 	int16_t offsetX, offsetY;*/
 
-bool Touch_Get_Data(bool wantY, uint16_t* rslt);
+bool Touch_Get_Data(uint16_t* x, uint16_t* y, uint16_t* z);
 //uint16_t diff(uint16_t a, uint16_t b) { return (a < b) ? b - a : a - b; }
 
 #endif

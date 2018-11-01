@@ -185,8 +185,8 @@
       <type>1</type>
       <location>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c</location>
     </link><link>
-      <name>Middlewares/FreeRTOS/heap_3.c</name>
+      <name>Middlewares/FreeRTOS/heap_4.c</name>
       <type>1</type>
-      <location>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_3.c</location>
+      <location>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c</location>
     </link></linkedResources>
 </projectDescription>

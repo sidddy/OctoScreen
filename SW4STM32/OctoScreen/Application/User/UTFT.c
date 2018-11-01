@@ -77,7 +77,7 @@ uint8_t LCD_Cmd_Read8(uint8_t cmd) {
 	uint16_t val = GPIOE->IDR; // dummy read
 
 	HAL_GPIO_WritePin(LCD_nRD_GPIO_Port, LCD_nRD_Pin, GPIO_PIN_SET);
-	osDelay(1);
+	HAL_Delay(1);
 
 	HAL_GPIO_WritePin(LCD_nRD_GPIO_Port, LCD_nRD_Pin, GPIO_PIN_RESET);
 

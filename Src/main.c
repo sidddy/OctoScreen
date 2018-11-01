@@ -86,7 +86,7 @@ void StartDefaultTask(void const * argument);
 void bing()
 {
 	  HAL_GPIO_TogglePin(SPEAKER_GPIO_Port, SPEAKER_Pin);
-	  osDelay(1);
+	  HAL_Delay(1);
 	  HAL_GPIO_TogglePin(SPEAKER_GPIO_Port, SPEAKER_Pin);
 }
 
@@ -125,6 +125,14 @@ int main(void)
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
 
+  bing();
+  HAL_Delay(1000);
+  initDisplay();
+  Touch_Init(320,240);
+  initScreens();
+  bing();
+
+
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -141,7 +149,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 1024);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 512);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -270,7 +278,7 @@ static void MX_SPI3_Init(void)
   hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi3.Init.NSS = SPI_NSS_SOFT;
-  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -408,28 +416,7 @@ void StartDefaultTask(void const * argument)
   MX_FATFS_Init();
 
   /* USER CODE BEGIN 5 */
-  osDelay(1000);
-  initDisplay();
-  Touch_Init(320,240);
-  lv_init();
- // bing();
 
-  lv_disp_drv_t disp_drv;
-  lv_disp_drv_init(&disp_drv);           /*Basic initialization*/
-  disp_drv.disp_flush = display_flush;
-  lv_disp_drv_register(&disp_drv);
-
-  /*Create a Label on the currently active screen*/
-  lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
-
-  /*Modify the Label's text*/
-  lv_label_set_text(label1, "Hello world!");
-  //lv_obj_set_style(label1, &lv_style_pretty);
-
-  /* Align the Label to the center
-   * NULL means align on parent (which is the screen now)
-   * 0, 0 at the end means an x, y offset after alignment*/
-  lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
 
   /* Infinite loop */
   int cnt = 0;
@@ -444,12 +431,14 @@ void StartDefaultTask(void const * argument)
 		  cnt = 0;
 	  }
 	  if (cnt2 == 10000) {
-		  bing();
+		//  bing();
 		  cnt2 = 0;
 	  }
-	  uint16_t x,y;
-	  if (Touch_Get_Data(true, NULL)) {
-		 bing();
+	  uint16_t x,y,z;
+	  if (Touch_Get_Data(&x, &y, &z)) {
+		  char buf[64];
+		  snprintf(buf,64,"X=%d Y=%d Z=%d",x,y,z);
+		  setMessage(buf);
 	  }
 
   }

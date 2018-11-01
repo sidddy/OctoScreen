@@ -11,11 +11,24 @@
 
 #include "UTouch.h"
 
+#define CMD_X 0x91
+#define CMD_Y 0xD1
+#define CMD_Z1 0xB1
+#define CMD_Z2 0xC1
+
 uint16_t diff(uint16_t a, uint16_t b) { return (a < b) ? b - a : a - b; }
 
 uint16_t disp_x_size, disp_y_size;
 uint16_t scaleX, scaleY;
 int16_t offsetX, offsetY;
+
+float alpha_x;
+float beta_x;
+float delta_x;
+float alpha_y;
+float beta_y;
+float delta_y;
+
 
 extern SPI_HandleTypeDef hspi3;
 #define hspi_touch (hspi3)
@@ -34,7 +47,7 @@ void Touch_Init(uint16_t xp, uint16_t yp)
 	uint8_t pTxData[3] = { 0xd4, 0, 0 };
 	uint8_t pRxData[3];
 
-	osDelay(50);
+	HAL_Delay(50);
 
 	/* warmup */
 	HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
@@ -42,94 +55,113 @@ void Touch_Init(uint16_t xp, uint16_t yp)
 	HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
 
 	HAL_GPIO_WritePin(TOUCH_nCS_GPIO_Port, TOUCH_nCS_Pin, GPIO_PIN_SET);
+
+	float calA[2] = {30,30};
+	float calB[2] = {300,100};
+	float calC[2] = {150,220};
+
+	float calA_raw[2] = {3451,651};
+	float calB_raw[2] = {812,1924};
+	float calC_raw[2] = {2100,3188};
+
+	float delta = (calA_raw[0]-calC_raw[0])*(calB_raw[1]-calC_raw[1]) -
+	       (calB_raw[0]-calC_raw[0])*(calA_raw[1]-calC_raw[1]);
+	alpha_x = (float)((calA[0]-calC[0])*(calB_raw[1]-calC_raw[1]) -
+	       (calB[0]-calC[0])*(calA_raw[1]-calC_raw[1])) / delta;
+	beta_x = (float)((calA_raw[0]-calC_raw[0])*(calB[0]-calC[0]) -
+	       (calB_raw[0]-calC_raw[0])*(calA[0]-calC[0])) / delta;
+	delta_x = ((uint64_t)calA[0]*(calB_raw[0]*calC_raw[1]-calC_raw[0]*calB_raw[1]) -
+	       (uint64_t)calB[0]*(calA_raw[0]*calC_raw[1]-calC_raw[0]*calA_raw[1]) +
+	       (uint64_t)calC[0]*(calA_raw[0]*calB_raw[1]-calB_raw[0]*calA_raw[1])) / delta;
+	alpha_y = (float)((calA[1]-calC[1])*(calB_raw[1]-calC_raw[1]) -
+	       (calB[1]-calC[1])*(calA_raw[1]-calC_raw[1])) / delta;
+	beta_y = (float)((calA_raw[0]-calC_raw[0])*(calB[1]-calC[1]) -
+	       (calB_raw[0]-calC_raw[0])*(calA[1]-calC[1])) / delta;
+	delta_y = ((uint64_t)calA[1]*(calB_raw[0]*calC_raw[1]-calC_raw[0]*calB_raw[1]) -
+	       (uint64_t)calB[1]*(calA_raw[0]*calC_raw[1]-calC_raw[0]*calA_raw[1]) +
+	       (uint64_t)calC[1]*(calA_raw[0]*calB_raw[1]-calB_raw[0]*calA_raw[1])) / delta;
+
 }
 
-// If the panel is touched, return the coordinates in x and y and return true; else return false
-bool Touch_Read(uint16_t* px, uint16_t* py, uint16_t* rawX, uint16_t* rawY)
-{
-	bool ret = false;
+static int16_t besttwoavg( int16_t x , int16_t y , int16_t z ) {
+  int16_t da, db, dc;
+  int16_t reta = 0;
+  if ( x > y ) da = x - y; else da = y - x;
+  if ( x > z ) db = x - z; else db = z - x;
+  if ( z > y ) dc = z - y; else dc = y - z;
 
-	if (HAL_GPIO_ReadPin(TOUCH_DI_GPIO_Port, TOUCH_DI_Pin) == GPIO_PIN_RESET)	// if screen is touched
-	{
-		HAL_GPIO_WritePin(TOUCH_nCS_GPIO_Port, TOUCH_nCS_Pin, GPIO_PIN_RESET);
+  if ( da <= db && da <= dc ) reta = (x + y) >> 1;
+  else if ( db <= da && db <= dc ) reta = (x + z) >> 1;
+  else reta = (y + z) >> 1;   //    else if ( dc <= da && dc <= db ) reta = (x + y) >> 1;
 
-		osDelay(1); // allow the screen to settle
-		uint16_t tx;
-
-		if (Touch_Get_Data(false, &tx))
-		{
-			uint16_t ty;
-
-			if (Touch_Get_Data(true, &ty))
-			{
-				if (HAL_GPIO_ReadPin(TOUCH_DI_GPIO_Port, TOUCH_DI_Pin) == GPIO_PIN_RESET)
-				{
-					/*int16_t valx = (orientAdjust & SwapXY) ? ty : tx;
-					if (orientAdjust & ReverseX)
-					{
-						valx = 4095 - valx;
-					}*/
-					int16_t valx = tx;
-
-					int16_t cx = (int16_t)(((uint32_t)valx * (uint32_t)scaleX) >> 16) - offsetX;
-					*px = (cx < 0) ? 0 : (cx >= disp_x_size) ? disp_x_size - 1 : (uint16_t)cx;
-
-					/*int16_t valy = (orientAdjust & SwapXY) ? tx : ty;
-					if (orientAdjust & ReverseY)
-					{
-						valy = 4095 - valy;
-					}*/
-					int16_t valy = ty;
-
-					int16_t cy = (int16_t)(((uint32_t)valy * (uint32_t)scaleY) >> 16) - offsetY;
-					*py = (cy < 0) ? 0 : (cy >= disp_y_size) ? disp_y_size - 1 : (uint16_t)cy;
-					if (rawX != NULL)
-					{
-						*rawX = valx;
-					}
-					if (rawY != NULL)
-					{
-						*rawY = valy;
-					}
-					ret = true;
-				}
-			}
-		}
-
-		HAL_GPIO_WritePin(TOUCH_nCS_GPIO_Port, TOUCH_nCS_Pin, GPIO_PIN_SET);
-	}
-	return ret;
+  return (reta);
 }
 
 // Get data from the touch chip. CS has already been set low.
 // We need to allow the touch chip ADC input to settle. See TI app note http://www.ti.com/lit/pdf/sbaa036.
-bool Touch_Get_Data(bool wantY, uint16_t* rslt)
+bool Touch_Get_Data(uint16_t* x, uint16_t* y, uint16_t* z)
 {
-	uint8_t pTxData[3] = { (uint8_t) ((wantY) ? 0xD3 : 0x93), 0, 0 };
-	uint8_t pRxData1[3];
-	uint8_t pRxData2[3];
-	uint8_t pRxData3[3];
+	uint8_t pTxData[3] = {0,0,0};//{ (uint8_t) ((wantY) ? 0xD3 : 0x93), 0, 0 };
+	uint8_t pRxData[3];
+
+	int16_t data[6];
+
 
 	HAL_GPIO_WritePin(TOUCH_nCS_GPIO_Port, TOUCH_nCS_Pin, GPIO_PIN_RESET);
 
-	pTxData[0] = 0xB3; // z1
-	HAL_StatusTypeDef res1 = HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData1, 3, 1000);
+	pTxData[0] = CMD_Z1; // z1
+	HAL_StatusTypeDef res = HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
+	int z1 = ((pRxData[1] * 256 + pRxData[2]) >> 3)+4095;
 
-	pTxData[0] = 0xC3; // z2
-	HAL_StatusTypeDef res2 = HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData2, 3, 1000);
+	pTxData[0] = CMD_Z2; // z2
+	res = HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
 
-	int z1 = ((pRxData1[1] * 256 + pRxData1[2]) >> 3)+4095;
-	int z2 = (pRxData2[1] * 256 + pRxData2[2]) >> 3;
+	int z2 = (pRxData[1] * 256 + pRxData[2]) >> 3;
 
 	//pTxData[0] = 0x81;
 	//HAL_StatusTypeDef res3 = HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData3, 3, 1000);
 
-	HAL_GPIO_WritePin(TOUCH_nCS_GPIO_Port, TOUCH_nCS_Pin, GPIO_PIN_SET);
+	if (z1-z2 > 700) {
+		*z = z1 - z2;
+		pTxData[0] = CMD_X; // x, for warmup
+		HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
 
-	if (z1-z2 > 500) {
+		pTxData[0] = CMD_X; // x
+		HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
+		data[0] = (pRxData[1] * 256 + pRxData[2]) >> 3;
+
+		pTxData[0] = CMD_Y; // y
+		HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
+		data[1] = (pRxData[1] * 256 + pRxData[2]) >> 3;
+
+		pTxData[0] = CMD_X; // x
+		HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
+		data[2] = (pRxData[1] * 256 + pRxData[2]) >> 3;
+
+		pTxData[0] = CMD_Y; // y
+		HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
+		data[3] = (pRxData[1] * 256 + pRxData[2]) >> 3;
+
+		pTxData[0] = CMD_X; // x
+		HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
+		data[4] = (pRxData[1] * 256 + pRxData[2]) >> 3;
+
+		pTxData[0] = CMD_Y; // y
+		HAL_SPI_TransmitReceive(&hspi_touch, pTxData, pRxData, 3, 1000);
+		data[5] = (pRxData[1] * 256 + pRxData[2]) >> 3;
+
+		uint16_t xraw = besttwoavg( data[0], data[2], data[4] );
+		uint16_t yraw = besttwoavg( data[1], data[3], data[5] );
+
+		*x = alpha_x * xraw + beta_x * yraw + delta_x;
+		*y = alpha_y * xraw + beta_y * yraw + delta_y;
+
+
+		HAL_GPIO_WritePin(TOUCH_nCS_GPIO_Port, TOUCH_nCS_Pin, GPIO_PIN_SET);
 		return true;
 	}
 
+	HAL_GPIO_WritePin(TOUCH_nCS_GPIO_Port, TOUCH_nCS_Pin, GPIO_PIN_SET);
 	return false;
 
 	//	int16_t z1 = SPI.transfer16(0xC1 /* Z2 */) >> 3;
