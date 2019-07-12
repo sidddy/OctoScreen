@@ -12,6 +12,7 @@ Purpose of this project is to provide an altrernative firmware for an MKS TFT to
 - This project was written using the System Workbench for STM32, https://www.st.com/en/development-tools/sw4stm32.html
 - You'll need an ST-LINK v2 adapter to transfer the firmware from your development environment to the MKS TFT display.
 - The IDE plugin generated some of the coding specifically for the MKS TFT 3.2 device, so take care not to overwrite these generated coding parts during development.
+- OctoScreen uses LVGL as GUI library. It's included as a submodule in the git repository, so make sure to also clone the submodules when cloning this repository
 
 ### Connecting ST-LINK v2 to the MKS TFT:
 | ST-LINK | MKS-TFT32 |
@@ -26,6 +27,8 @@ Flashing custom firmware to your MKS TFT requires to unlock the flash memory, wh
 
 
 ## Screenshots
+
+(Note that these images are from the LVGL simulator, so there's no actual printer data displayed. Real life display contents are more exciting... ;-) )
 
 ### Home Tab
 ![Home Tab](https://github.com/sidddy/OctoScreen/raw/master/screenshots/Home.png)
