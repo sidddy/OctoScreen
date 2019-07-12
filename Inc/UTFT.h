@@ -50,7 +50,7 @@
 
 #define DISPLAY_X 320
 #define DISPLAY_Y 240
-#define DISPLAY_PIXELS 64000
+#define DISPLAY_PIXELS 76800
 
 #define ST7789_NOP     0x00
 #define ST7789_SWRESET 0x01
@@ -102,7 +102,7 @@ void _set_direction_registers();
 void LCD_Write_COM(uint8_t VL);
 void LCD_Write_DATA8(uint8_t VL);
 void LCD_Write_DATA16(uint16_t VHL);
-void LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num);
+void LCD_Write_Repeated_DATA16(uint16_t VHL, uint32_t num);
 void LCD_Write_COM_DATA16(uint8_t com1, uint16_t dat1);
 void LCD_Write_COM_DATA8(uint8_t com1, uint8_t dat1);
 void LCD_Write_COM_DATA(uint8_t com1, uint16_t dat1);

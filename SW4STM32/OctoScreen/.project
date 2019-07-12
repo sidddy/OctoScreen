@@ -121,14 +121,6 @@
       <type>1</type>
       <location>PARENT-2-PROJECT_LOC/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_spi_ex.c</location>
     </link><link>
-      <name>Application/User/user_diskio.c</name>
-      <type>1</type>
-      <location>PARENT-2-PROJECT_LOC/Src/user_diskio.c</location>
-    </link><link>
-      <name>Application/User/fatfs.c</name>
-      <type>1</type>
-      <location>PARENT-2-PROJECT_LOC/Src/fatfs.c</location>
-    </link><link>
       <name>Application/User/freertos.c</name>
       <type>1</type>
       <location>PARENT-2-PROJECT_LOC/Src/freertos.c</location>
@@ -136,22 +128,6 @@
       <name>Application/User/stm32f1xx_hal_timebase_TIM.c</name>
       <type>1</type>
       <location>PARENT-2-PROJECT_LOC/Src/stm32f1xx_hal_timebase_TIM.c</location>
-    </link><link>
-      <name>Middlewares/FatFs/syscall.c</name>
-      <type>1</type>
-      <location>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/option/syscall.c</location>
-    </link><link>
-      <name>Middlewares/FatFs/diskio.c</name>
-      <type>1</type>
-      <location>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/diskio.c</location>
-    </link><link>
-      <name>Middlewares/FatFs/ff_gen_drv.c</name>
-      <type>1</type>
-      <location>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</location>
-    </link><link>
-      <name>Middlewares/FatFs/ff.c</name>
-      <type>1</type>
-      <location>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/ff.c</location>
     </link><link>
       <name>Middlewares/FreeRTOS/port.c</name>
       <type>1</type>
@@ -188,5 +164,9 @@
       <name>Middlewares/FreeRTOS/heap_4.c</name>
       <type>1</type>
       <location>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c</location>
+    </link><link>
+      <name>Drivers/STM32F1xx_HAL_Driver/stm32f1xx_hal_uart.c</name>
+      <type>1</type>
+      <location>PARENT-2-PROJECT_LOC/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c</location>
     </link></linkedResources>
 </projectDescription>

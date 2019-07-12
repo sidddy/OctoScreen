@@ -7,79 +7,57 @@
 #include "Display.h"
 
 #include "UTFT.h"
+#include "UTouch.h"
 #include "cmsis_os.h"
 #include "lvgl/lvgl.h"
-#include "lvgl/lv_draw/lv_draw_arc.h"
-
 
 // global variables for LVGL
 lv_disp_drv_t disp_drv;
+lv_indev_drv_t indev_drv;
 lv_obj_t * label1;
 
-
-void initDisplay() {
-	LCD_Init();									// set up the LCD
-	LCD_Fill_Scr(0x8800);
-}
+#define HOME_LEFT_X 10
+#define HOME_EXT_Y 25
+#define HOME_BED_Y 55
+#define HOME_JOB_Y 85
+#define HOME_STATUS_Y 115
+#define HOME_TEMP_X 160
+#define HOME_BTN_Y 180
 
 void display_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p) {
 	LCD_Display_Flush(x1,y1,x2,y2,(uint16_t*)color_p);
 	lv_flush_ready();
 }
 
-
-
-void calibrationScreen() {
-#define LEDSIZE 20
-	uint16_t calA[2] = {30,30};
-	uint16_t calB[2] = {300,100};
-	uint16_t calC[2] = {150,220};
-
-	lv_obj_t * led1  = lv_led_create(lv_scr_act(), NULL);
-	//lv_obj_set_style(led1, &style_led);
-	lv_obj_set_size(led1, LEDSIZE, LEDSIZE);
-	lv_obj_set_x(led1, calA[0] - LEDSIZE/2);
-	lv_obj_set_y(led1, calA[1] - LEDSIZE/2);
-
-	lv_obj_t * led2  = lv_led_create(lv_scr_act(), NULL);
-	lv_obj_set_size(led2, LEDSIZE, LEDSIZE);
-	lv_obj_set_x(led2, calB[0] - LEDSIZE/2);
-	lv_obj_set_y(led2, calB[1] - LEDSIZE/2);
-
-	lv_obj_t * led3  = lv_led_create(lv_scr_act(), NULL);
-	lv_obj_set_size(led3, LEDSIZE, LEDSIZE);
-	lv_obj_set_x(led3, calC[0] - LEDSIZE/2);
-	lv_obj_set_y(led3, calC[1] - LEDSIZE/2);
-
-	lv_led_on(led1);
+bool touch_input_read(lv_indev_data_t *data)
+{
+	uint16_t x,y,z;
+	if (Touch_Get_Filtered_Data(&x, &y, &z)) {
+		data->point.x = x;
+		data->point.y = y;
+		data->state = LV_INDEV_STATE_PR;
+	} else {
+		data->state = LV_INDEV_STATE_REL;
+	}
+    return false;  			/*No buffering so no more data read*/
 }
 
-void initScreens() {
+
+void initDisplay() {
+	LCD_Init();									// set up the LCD
+	LCD_Fill_Scr(0xFFFF);
 	lv_init();
 
-	lv_disp_drv_init(&disp_drv);           /*Basic initialization*/
+	lv_disp_drv_init(&disp_drv);
 	disp_drv.disp_flush = display_flush;
 	lv_disp_drv_register(&disp_drv);
 
-	/*Create a Label on the currently active screen*/
-	label1 =  lv_label_create(lv_scr_act(), NULL);
-
-	/*Modify the Label's text*/
-	lv_label_set_text(label1, "Hello world!");
-	//lv_obj_set_style(label1, &lv_style_pretty);
-
-	/* Align the Label to the center
-	 * NULL means align on parent (which is the screen now)
-	 * 0, 0 at the end means an x, y offset after alignment*/
-	lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
-
-	calibrationScreen();
+	lv_indev_drv_init(&indev_drv);
+	indev_drv.type = LV_INDEV_TYPE_POINTER;
+	indev_drv.read = touch_input_read;
+	lv_indev_drv_register(&indev_drv);
 }
 
-void setMessage(char* msg) {
-	lv_label_set_text(label1, msg);
-	lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
-}
 
 
 

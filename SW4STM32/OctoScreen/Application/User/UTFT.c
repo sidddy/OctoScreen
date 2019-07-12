@@ -116,7 +116,7 @@ inline void LCD_Write_DATA16(uint16_t VHL)
     GPIOB->BSRR = LCD_nWR_Pin;
 }
 
-inline void LCD_Write_Repeated_DATA16(uint16_t VHL, uint16_t num)
+inline void LCD_Write_Repeated_DATA16(uint16_t VHL, uint32_t num)
 {
 	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);
 

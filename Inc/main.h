@@ -65,6 +65,8 @@
 #define TOUCH_DI_GPIO_Port GPIOC
 #define LCD_nWR_Pin GPIO_PIN_14
 #define LCD_nWR_GPIO_Port GPIOB
+#define WIFI_GPIO_0_Pin GPIO_PIN_8
+#define WIFI_GPIO_0_GPIO_Port GPIOD
 #define LCD_RS_Pin GPIO_PIN_13
 #define LCD_RS_GPIO_Port GPIOD
 #define LCD_BACKLIGHT_Pin GPIO_PIN_14

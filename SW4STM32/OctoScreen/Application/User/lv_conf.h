@@ -20,7 +20,7 @@
  * to store the graphical objects and other data */
 #define LV_MEM_CUSTOM      0                /*1: use custom malloc/free, 0: use the built-in lv_mem_alloc/lv_mem_free*/
 #if LV_MEM_CUSTOM == 0
-#define LV_MEM_SIZE    (10U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
+#define LV_MEM_SIZE    (12U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
 #define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
 #define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
 #else       /*LV_MEM_CUSTOM*/
@@ -84,9 +84,9 @@
 #define USE_LV_ANIMATION        1               /*1: Enable all animations*/
 #define USE_LV_SHADOW           1               /*1: Enable shadows*/
 #define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
-#define USE_LV_GPU              1               /*1: Enable GPU interface*/
-#define USE_LV_REAL_DRAW        1               /*1: Enable function which draw directly to the frame buffer instead of VDB (required if LV_VDB_SIZE = 0)*/
-#define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images*/
+#define USE_LV_GPU              0               /*1: Enable GPU interface*/
+#define USE_LV_REAL_DRAW        0               /*1: Enable function which draw directly to the frame buffer instead of VDB (required if LV_VDB_SIZE = 0)*/
+#define USE_LV_FILESYSTEM       0               /*1: Enable file system (required by images*/
 
 /*Compiler settings*/
 #define LV_ATTRIBUTE_TICK_INC                   /* Define a custom attribute to `lv_tick_inc` function */
@@ -127,7 +127,7 @@
 #define USE_LV_THEME_ALIEN      0       /*Dark futuristic theme*/
 #define USE_LV_THEME_NIGHT      0       /*Dark elegant theme*/
 #define USE_LV_THEME_MONO       0       /*Mono color theme for monochrome displays*/
-#define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows*/
+#define USE_LV_THEME_MATERIAL   1       /*Flat theme with bold colors and light shadows*/
 #define USE_LV_THEME_ZEN        0       /*Peaceful, mainly light theme */
 #define USE_LV_THEME_NEMO       0       /*Water-like theme based on the movie "Finding Nemo"*/
 
@@ -144,7 +144,7 @@
 #define USE_LV_FONT_SYMBOL_10              0
 
 #define USE_LV_FONT_DEJAVU_20              4
-#define USE_LV_FONT_DEJAVU_20_LATIN_SUP    0
+#define USE_LV_FONT_DEJAVU_20_LATIN_SUP    4
 #define USE_LV_FONT_DEJAVU_20_CYRILLIC     0
 #define USE_LV_FONT_SYMBOL_20              4
 
@@ -173,8 +173,8 @@
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/
-#define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
-#define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
+//#define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
+//#define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
 
 /*==================
  *  LV OBJ X USAGE
@@ -201,7 +201,7 @@
 #endif
 
 /*Line (dependencies: -*/
-#define USE_LV_LINE     1
+#define USE_LV_LINE     0
 
 /*Arc (dependencies: -)*/
 #define USE_LV_ARC      1
@@ -217,12 +217,12 @@
 #define USE_LV_PAGE     1
 
 /*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
-#define USE_LV_WIN      1
+#define USE_LV_WIN      0
 
 /*Tab (dependencies: lv_page, lv_btnm)*/
 #define USE_LV_TABVIEW      1
 #if USE_LV_TABVIEW != 0
-#define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
+#define LV_TABVIEW_ANIM_TIME    200     /*Time of slide animation [ms] (0: no animation)*/
 #endif
 
 /*************************
@@ -233,13 +233,13 @@
 #define USE_LV_BAR      1
 
 /*Line meter (dependencies: *;)*/
-#define USE_LV_LMETER   1
+#define USE_LV_LMETER   0
 
 /*Gauge (dependencies:bar, lmeter)*/
-#define USE_LV_GAUGE    1
+#define USE_LV_GAUGE    0
 
 /*Chart (dependencies: -)*/
-#define USE_LV_CHART    1
+#define USE_LV_CHART    0
 
 /*LED (dependencies: -)*/
 #define USE_LV_LED      1
@@ -248,17 +248,17 @@
 #define USE_LV_MBOX     1
 
 /*Text area (dependencies: lv_label, lv_page)*/
-#define USE_LV_TA       1
+#define USE_LV_TA       0
 #if USE_LV_TA != 0
 #define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
 #define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
 /*Calendar (dependencies: -)*/
-#define USE_LV_CALENDAR 1
+#define USE_LV_CALENDAR 0
 
 /*Preload (dependencies: arc)*/
-#define USE_LV_PRELOAD      1
+#define USE_LV_PRELOAD      0
 #if USE_LV_PRELOAD != 0
 #define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
 #define LV_PRELOAD_DEF_SPIN_TIME    1000    /*[ms]*/
@@ -275,40 +275,40 @@
 #endif
 
 /*Image Button (dependencies: lv_btn*/
-#define USE_LV_IMGBTN   1
+#define USE_LV_IMGBTN   0
 
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1
 
 /*Keyboard (dependencies: lv_btnm)*/
-#define USE_LV_KB       1
+#define USE_LV_KB       0
 
 /*Check box (dependencies: lv_btn, lv_label)*/
-#define USE_LV_CB       1
+#define USE_LV_CB       0
 
 /*List (dependencies: lv_page, lv_btn, lv_label, (lv_img optionally for icons ))*/
-#define USE_LV_LIST     1
+#define USE_LV_LIST     0
 #if USE_LV_LIST != 0
 #define LV_LIST_FOCUS_TIME  100 /*Default animation time of focusing to a list element [ms] (0: no animation)  */
 #endif
 
 /*Drop down list (dependencies: lv_page, lv_label)*/
-#define USE_LV_DDLIST    1
+#define USE_LV_DDLIST    0
 #if USE_LV_DDLIST != 0
 #define LV_DDLIST_ANIM_TIME     200     /*Open and close default animation time [ms] (0: no animation)*/
 #endif
 
 /*Roller (dependencies: lv_ddlist)*/
-#define USE_LV_ROLLER    1
+#define USE_LV_ROLLER    0
 #if USE_LV_ROLLER != 0
 #define LV_ROLLER_ANIM_TIME     200     /*Focus animation time [ms] (0: no animation)*/
 #endif
 
 /*Slider (dependencies: lv_bar)*/
-#define USE_LV_SLIDER    1
+#define USE_LV_SLIDER    0
 
 /*Switch (dependencies: lv_slider)*/
-#define USE_LV_SW       1
+#define USE_LV_SW       0
 
 /*************************
  * Non-user section

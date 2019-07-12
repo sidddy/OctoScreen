@@ -18,6 +18,7 @@ void adjustOrientation(DisplayOrientation a) { orientAdjust = (DisplayOrientatio
 	int16_t offsetX, offsetY;*/
 
 bool Touch_Get_Data(uint16_t* x, uint16_t* y, uint16_t* z);
+bool Touch_Get_Filtered_Data(uint16_t* x, uint16_t* y, uint16_t* z);
 //uint16_t diff(uint16_t a, uint16_t b) { return (a < b) ? b - a : a - b; }
 
 #endif

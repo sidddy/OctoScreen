@@ -30,7 +30,7 @@
 								</outputEntries>
 							</builder>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.1224029619" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler">
-								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.991672217" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.none" valueType="enumerated" />
+								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.991672217" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.debug" valueType="enumerated" />
 								<option id="gnu.c.compiler.option.debugging.level.2100734933" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated" />
 								<option id="gnu.c.compiler.option.include.paths.340966200" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../../../Inc" />
@@ -39,7 +39,7 @@
 									<listOptionValue builtIn="false" value="../../../Drivers/CMSIS/Device/ST/STM32F1xx/Include" />
 									<listOptionValue builtIn="false" value="../../../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" />
-									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FatFs/src" />
+									
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/include" />
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" />
 									<listOptionValue builtIn="false" value="../../../../../../../../../../../../../Drivers/CMSIS/Include" />
@@ -56,7 +56,7 @@
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.61526516" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s" />
 							</tool>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.595646542" name="MCU G++ Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler">
-								<option defaultValue="gnu.cpp.optimization.level.none" id="fr.ac6.managedbuild.gnu.cpp.compiler.option.optimization.level.2049131352" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.cpp.optimization.level.none" valueType="enumerated" />
+								<option defaultValue="gnu.cpp.optimization.level.none" id="fr.ac6.managedbuild.gnu.cpp.compiler.option.optimization.level.2049131352" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.cpp.optimization.level.debug" valueType="enumerated" />
 								<option id="gnu.cpp.compiler.option.debugging.level.1461758182" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated" />
 								<option id="gnu.cpp.compiler.option.include.paths.385836725" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../../../Inc" />
@@ -65,7 +65,7 @@
 									<listOptionValue builtIn="false" value="../../../Drivers/CMSIS/Device/ST/STM32F1xx/Include" />
 									<listOptionValue builtIn="false" value="../../../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" />
-									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FatFs/src" />
+									
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/include" />
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" />
 									<listOptionValue builtIn="false" value="../../../../../../../../../../../../../Drivers/CMSIS/Include" />
@@ -95,7 +95,7 @@
 								<option id="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.script.1273967086" name="Linker Script (-T)" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.script" useByScannerDiscovery="false" value="../STM32F107VCTx_FLASH.ld" valueType="string" />
 								<option id="gnu.cpp.link.option.libs.1674148523" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" />
 								<option id="gnu.cpp.link.option.paths.2059006928" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" />
-								<option id="gnu.cpp.link.option.flags.1881986857" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-specs=nosys.specs -specs=nano.specs" valueType="string" />
+								<option id="gnu.cpp.link.option.flags.1881986857" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-specs=nosys.specs -specs=nano.specs -u _printf_float" valueType="string" />
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1039820436" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)" />
 									<additionalInput kind="additionalinput" paths="$(LIBS)" />
@@ -154,7 +154,7 @@
 									<listOptionValue builtIn="false" value="../../../Drivers/CMSIS/Device/ST/STM32F1xx/Include" />
 									<listOptionValue builtIn="false" value="../../../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" />
-									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FatFs/src" />
+									
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/include" />
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" />
 									<listOptionValue builtIn="false" value="../../../../../../../../../../../../../Drivers/CMSIS/Include" />
@@ -180,7 +180,7 @@
 									<listOptionValue builtIn="false" value="../../../Drivers/CMSIS/Device/ST/STM32F1xx/Include" />
 									<listOptionValue builtIn="false" value="../../../Drivers/CMSIS/Include" />
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" />
-									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FatFs/src" />
+									
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/include" />
 									<listOptionValue builtIn="false" value="../../../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" />
 									<listOptionValue builtIn="false" value="../../../../../../../../../../../../../Drivers/CMSIS/Include" />
