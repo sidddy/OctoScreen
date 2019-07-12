@@ -1,6 +1,6 @@
 # OctoScreen
 
-Purpose of this project is to provide an altrernative firmware for an MKS TFT touchscreen device for 3D printers. It get connected to an OctoPrint server via a MKS WIFI device (which is basically an ESP8266), running OctoHub (link TBD).
+Purpose of this project is to provide an altrernative firmware for an MKS TFT touchscreen device for 3D printers. It gets connected to an OctoPrint server via a MKS WIFI device (which is basically an ESP8266), running OctoHub (link TBD).
 
 ## Technical Requirements
 - Supports the display **MKS TFT 3.2 V4.0** only. Older hardware revisions of the display use different components and are not supported. Other sizes of the display might use similar hardware, but they would require some code changes due to different resolution etc.
@@ -25,6 +25,12 @@ Purpose of this project is to provide an altrernative firmware for an MKS TFT to
 ## WARNING
 Flashing custom firmware to your MKS TFT requires to unlock the flash memory, which erases all contents. I.e., you won't be able to save any backup of the existing MKS firmware and bootloader. So, to summarize: **Once you decide to flash this custom firmware, there's no easy way back to the stock firmware.**
 
+## Issues
+
+Known issues so far:
+- The precision of the touch recognition is... well... bad. Especially on the borders of the display, you'll sometimes need to push multiple times to properly press a button.
+- You'll probably need to re-calibrate the display driver for your specific display. There's some commented out debug coding to output the raw values from the display, so you can use these to update tha calibraton parameters.
+- The display sometimes freezes for unknown reasons. This seems to happen more frequently when there's bad WIFI reception for the OctoHub wifi dongle.
 
 ## Screenshots
 
