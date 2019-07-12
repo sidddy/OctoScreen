@@ -21,6 +21,9 @@ Purpose of this project is to provide an altrernative firmware for an MKS TFT to
 | SWDIO   | JTAG DIO      |
 | SWCLK   | JTAG CLK      |
 
+## WARNING
+Flashing custom firmware to your MKS TFT requires to unlock the flash memory, which erases all contents. I.e., you won't be able to save any backup of the existing MKS firmware and bootloader. So, to summarize: **Once you decide to flash this custom firmware, there's no easy way back to the stock firmware.**
+
 
 ## Screenshots
 
