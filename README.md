@@ -24,4 +24,14 @@ Purpose of this project is to provide an altrernative firmware for an MKS TFT to
 
 ## Screenshots
 
-TBD
+### Home Tab
+![Home Tab](https://github.com/sidddy/OctoScreen/raw/master/screenshots/Home.png)
+
+### Move Tab
+![Move Tab](https://github.com/sidddy/OctoScreen/raw/master/screenshots/Move.png)
+
+### Temperature Tab
+![Temperature Tab](https://github.com/sidddy/OctoScreen/raw/master/screenshots/Temperature.png)
+
+### Files Tab
+![Files Tab](https://github.com/sidddy/OctoScreen/raw/master/screenshots/Files.png)
