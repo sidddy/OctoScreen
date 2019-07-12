@@ -6,7 +6,7 @@ Purpose of this project is to provide an altrernative firmware for an MKS TFT to
 - Supports the display **MKS TFT 3.2 V4.0** only. Older hardware revisions of the display use different components and are not supported. Other sizes of the display might use similar hardware, but they would require some code changes due to different resolution etc.
 - You'll need a running OctoPrint server which is accessbile via API.
 - You'll need an MQTT server (which is used to push information from OctoPrint via OctoHub to the display)
-- OctoPrint needs to run a custom plugin (link TBD) to serve some of the functions offered by OctoScreen/OctoHub.
+- OctoPrint needs to run a custom plugin (see https://github.com/sidddy/OctoScreen/tree/master/octoprint_plugin) to serve some of the functions offered by OctoScreen/OctoHub. INstall this plugin manually in the .octoprint/plugins folder of your Octoprint installation. You'll also need to install the standard MQTT plugin.
 
 ## Development Environment
 - This project was written using the System Workbench for STM32, https://www.st.com/en/development-tools/sw4stm32.html
