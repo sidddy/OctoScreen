@@ -1,6 +1,6 @@
 # OctoScreen
 
-Purpose of this project is to provide an altrernative firmware for an MKS TFT touchscreen device for 3D printers. It gets connected to an OctoPrint server via a MKS WIFI device (which is basically an ESP8266), running OctoHub (link TBD).
+Purpose of this project is to provide an altrernative firmware for an MKS TFT touchscreen device for 3D printers. It gets connected to an OctoPrint server via a MKS WIFI device (which is basically an ESP8266), running OctoHub (https://github.com/sidddy/octohub).
 
 ## Technical Requirements
 - Supports the display **MKS TFT 3.2 V4.0** only. Older hardware revisions of the display use different components and are not supported. Other sizes of the display might use similar hardware, but they would require some code changes due to different resolution etc.
