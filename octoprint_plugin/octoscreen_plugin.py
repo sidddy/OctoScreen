@@ -23,6 +23,14 @@ class OctoscreenPlugin(octoprint.plugin.StartupPlugin,octoprint.plugin.EventHand
 		if request.args.get('path'):
 			req_path = request.args.get('path')
 
+		req_from = 0
+		if request.args.get('from'):
+			req_from = int(request.args.get('from'))
+
+		req_to = 99999
+		if request.args.get('to'):
+                        req_to = int(request.args.get('to'))
+
 		if fileManager.folder_exists(FileDestinations.LOCAL, req_path):
 			files=fileManager.list_files(path=req_path, filter=None, recursive=False)
 
@@ -50,12 +58,27 @@ class OctoscreenPlugin(octoprint.plugin.StartupPlugin,octoprint.plugin.EventHand
 
 					tmp_f.append([n,succ])
 
-			result = dict()
-			result["path"] = req_path
-			result["files"] = sorted(tmp_f, key=lambda s: s[0].lower())
-			result["directories"] = sorted(tmp_d, key=lambda s: s.lower())
-			
-			return jsonify(result)
+			tmp_result = dict()
+			tmp_result["path"] = req_path
+			tmp_result["files"] = sorted(tmp_f, key=lambda s: s[0].lower())
+			tmp_result["directories"] = sorted(tmp_d, key=lambda s: s.lower())
+			tmp_result["total"] = len(tmp_result["files"]) + len(tmp_result["directories"])
+
+			if (req_from != 0 or req_to != 99999):
+				result = dict()
+				result["from"] = req_from
+				result["to"] = req_to
+				result["path"] = tmp_result["path"]
+				result["directories"] = []
+				result["files"] = []
+				result["total"] = tmp_result["total"]
+				for nr in range(req_from, req_to+1):
+					if nr < len(tmp_result["directories"]):
+						result["directories"].append(tmp_result["directories"][nr])
+					elif nr-len(tmp_result["directories"]) < len(tmp_result["files"]):
+						result["files"].append(tmp_result["files"][nr-len(tmp_result["directories"])])
+				return jsonify(result)
+			return jsonify(tmp_result)
 		return None
 
 	def on_after_startup(self):
