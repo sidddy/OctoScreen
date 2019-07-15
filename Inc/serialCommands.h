@@ -8,6 +8,8 @@ void cmdJogY();
 void cmdJogZ();
 void cmdExtrude();
 void cmdHome();
+void cmdLoad();
+void cmdUnload();
 void cmdSetBedTemp(uint16_t t);
 void cmdSetToolTemp(uint16_t t);
 void cmdSetFolder(char* folder);
