@@ -6,8 +6,8 @@
  */
 
 #include "lvgl/lvgl.h"
-#include "lvgl/lv_draw/lv_draw_arc.h"
-#include "lvgl/lv_themes/lv_theme_material.h"
+#include "lvgl/src/lv_draw/lv_draw_arc.h"
+#include "lvgl/src/lv_themes/lv_theme_material.h"
 
 #include "screens.h"
 #include "serialCommands.h"
@@ -64,7 +64,7 @@ LV_IMG_DECLARE(z_height_img);
 
 
 #define TAB_COUNT 4
-char *tab_names[4] = { SYMBOL_HOME, SYMBOL_LOOP, "°C", SYMBOL_LIST };
+char *tab_names[4] = { LV_SYMBOL_HOME, LV_SYMBOL_LOOP, "°C", LV_SYMBOL_LIST };
 
 // Home Buttons & Labels
 lv_obj_t * lbl_hm_temp_tool;
@@ -155,8 +155,8 @@ void calibrationScreen() {
 }
 
 
-static lv_res_t cbHomeTab(lv_obj_t * btn) {
-	if (btn == btn_hm_1) {
+static void cbHomeTab(lv_obj_t * btn, lv_event_t event) {
+	if ((btn == btn_hm_1) && (event == LV_EVENT_CLICKED)) {
 		lv_obj_t* lbl1 = lv_obj_get_child(btn_hm_1, NULL);
 		if (lbl1 != NULL) {
 			char* txt = lv_label_get_text(lbl1);
@@ -170,7 +170,7 @@ static lv_res_t cbHomeTab(lv_obj_t * btn) {
 				cmdResume();
 			}
 		}
-	} else if (btn == btn_hm_2) {
+	} else if ((btn == btn_hm_2) && (event == LV_EVENT_CLICKED)) {
 		lv_obj_t* lbl2 = lv_obj_get_child(btn_hm_2, NULL);
 		if (lbl2 != NULL) {
 			char* txt = lv_label_get_text(lbl2);
@@ -181,27 +181,27 @@ static lv_res_t cbHomeTab(lv_obj_t * btn) {
 			}
 		}
 	}
-	return LV_RES_OK;
+	return;
 }
 
-static lv_res_t cbHomeTabPauseMBox(lv_obj_t * btn, const char * txt)
+static void cbHomeTabPauseMBox(lv_obj_t * obj, lv_event_t event)
 {
-	lv_obj_set_hidden(mbox_hm_pause, true);
-    if (!strcmp(txt, "Yes")) {
-    	cmdPause();
-    }
-
-    return LV_RES_OK;
+	if (event == LV_EVENT_CLICKED) {
+		lv_obj_set_hidden(mbox_hm_pause, true);
+		if (!strcmp(lv_mbox_get_active_btn_text(obj), "Yes")) {
+			cmdPause();
+		}
+	}
 }
 
-static lv_res_t cbHomeTabCancelMBox(lv_obj_t * btn, const char * txt)
+static void cbHomeTabCancelMBox(lv_obj_t * obj, lv_event_t event)
 {
-	lv_obj_set_hidden(mbox_hm_cancel, true);
-    if (!strcmp(txt, "Yes")) {
-    	cmdCancel();
-    }
-
-    return LV_RES_OK;
+	if (event == LV_EVENT_CLICKED) {
+		lv_obj_set_hidden(mbox_hm_cancel, true);
+		if (!strcmp(lv_mbox_get_active_btn_text(obj), "Yes")) {
+			cmdCancel();
+		}
+	}
 }
 
 void initHomeTab(lv_obj_t *tab) {
@@ -236,7 +236,7 @@ void initHomeTab(lv_obj_t *tab) {
 	lbl_hm_job = lv_label_create(tab, NULL);
 	lv_label_set_text(lbl_hm_job, "n/a");
 	lv_obj_align(lbl_hm_job, txt, LV_ALIGN_IN_TOP_LEFT, 80, 0);
-	lv_label_set_long_mode(lbl_hm_job, LV_LABEL_LONG_ROLL);
+	lv_label_set_long_mode(lbl_hm_job, LV_LABEL_LONG_SROLL);
 	lv_obj_set_width(lbl_hm_job, 220);
 	lv_label_set_align(lbl_hm_job, LV_LABEL_ALIGN_LEFT);
 
@@ -248,7 +248,7 @@ void initHomeTab(lv_obj_t *tab) {
 
 	lbl_hm_status = lv_label_create(tab, NULL);
 	lv_obj_align(lbl_hm_status, txt, LV_ALIGN_IN_TOP_LEFT, 80, 0);
-	lv_label_set_long_mode(lbl_hm_status, LV_LABEL_LONG_ROLL);
+	lv_label_set_long_mode(lbl_hm_status, LV_LABEL_LONG_SROLL);
 	lv_obj_set_width(lbl_hm_status, 220);
 	lv_label_set_align(lbl_hm_status, LV_LABEL_ALIGN_LEFT);
 	lv_label_set_text(lbl_hm_status, "n/a");
@@ -259,20 +259,20 @@ void initHomeTab(lv_obj_t *tab) {
 	lv_obj_align(bar_hm_progress, txt, LV_ALIGN_IN_TOP_LEFT, 0, 30);
 
 	btn_hm_1 = lv_btn_create(tab, NULL);
-	lv_btn_set_fit (btn_hm_1, false, false);
+	lv_btn_set_fit(btn_hm_1, LV_FIT_NONE);
 	lv_obj_set_size(btn_hm_1,120,45);
 	lv_obj_align(btn_hm_1, bar_hm_progress, LV_ALIGN_IN_TOP_LEFT, 0, 20);
 	txt2 = lv_label_create(btn_hm_1, NULL);
 	lv_label_set_text(txt2, "Btn1");
-	lv_btn_set_action(btn_hm_1, LV_BTN_ACTION_CLICK, cbHomeTab);
+	lv_obj_set_event_cb(btn_hm_1, cbHomeTab);
 
 	btn_hm_2 = lv_btn_create(tab, NULL);
-	lv_btn_set_fit (btn_hm_2, false, false);
+	lv_btn_set_fit(btn_hm_2, LV_FIT_NONE);
 	lv_obj_set_size(btn_hm_2,120,45);
 	lv_obj_align(btn_hm_2, btn_hm_1, LV_ALIGN_IN_TOP_LEFT, 150, 0);
 	txt2 = lv_label_create(btn_hm_2, NULL);
 	lv_label_set_text(txt2, "Btn2");
-	lv_btn_set_action(btn_hm_2, LV_BTN_ACTION_CLICK, cbHomeTab);
+	lv_obj_set_event_cb(btn_hm_2, cbHomeTab);
 
 
 	static const char * btns[] ={"\221Yes", "\221No", ""};
@@ -280,14 +280,16 @@ void initHomeTab(lv_obj_t *tab) {
 
 	mbox_hm_pause = lv_mbox_create(tab, NULL);
 	lv_mbox_set_text(mbox_hm_pause, "Do you really want to pause the print?");
-	lv_mbox_add_btns(mbox_hm_pause, btns, cbHomeTabPauseMBox);
+	lv_mbox_add_btns(mbox_hm_pause, btns);
+	lv_obj_set_event_cb(mbox_hm_pause, cbHomeTabPauseMBox);
 	lv_obj_set_width(mbox_hm_pause, 250);
 	lv_obj_align(mbox_hm_pause, NULL, LV_ALIGN_CENTER, 0, 0);
 	lv_obj_set_hidden(mbox_hm_pause, true);
 
 	mbox_hm_cancel = lv_mbox_create(tab, NULL);
 	lv_mbox_set_text(mbox_hm_cancel, "Do you really want to cancel the print?");
-	lv_mbox_add_btns(mbox_hm_cancel, btns, cbHomeTabCancelMBox);
+	lv_mbox_add_btns(mbox_hm_cancel, btns);
+	lv_obj_set_event_cb(mbox_hm_cancel, cbHomeTabCancelMBox);
 	lv_obj_set_width(mbox_hm_cancel, 250);
 	lv_obj_align(mbox_hm_cancel, NULL, LV_ALIGN_CENTER, 0, 0);
 	lv_obj_set_hidden(mbox_hm_cancel, true);
@@ -296,8 +298,11 @@ void initHomeTab(lv_obj_t *tab) {
 
 }
 
-static lv_res_t cbMoveTab(lv_obj_t * btn)
+static void cbMoveTab(lv_obj_t * btn, lv_event_t event)
 {
+	if (event != LV_EVENT_CLICKED) {
+		return;
+	}
 	// X/Y/Z/E Button Group
    if (btn == btn_mv_x) {
 	   lv_btn_set_state(btn_mv_x, LV_BTN_STATE_TGL_REL);
@@ -382,45 +387,43 @@ static lv_res_t cbMoveTab(lv_obj_t * btn)
    else if (btn == btn_mv_load) {
    	   cmdLoad();
    }
-
-    return LV_RES_OK; /*Return OK if the button is not deleted*/
 }
 
 void initMoveTab(lv_obj_t *tab) {
 	// Home & Retract Buttons
 
 	btn_mv_home = lv_btn_create(tab, NULL);
-	lv_btn_set_fit (btn_mv_home, false, false);
+	lv_btn_set_fit(btn_mv_home, LV_FIT_NONE);
 	lv_obj_set_size(btn_mv_home, 70, 55);
 	lv_obj_set_pos(btn_mv_home, 0, TAB_START_Y);
-	lv_btn_set_action(btn_mv_home, LV_BTN_ACTION_CLICK, cbMoveTab);
+	lv_obj_set_event_cb(btn_mv_home, cbMoveTab);
 
 	btn_mv_retract = lv_btn_create(tab, btn_mv_home);
 	lv_obj_align(btn_mv_retract, btn_mv_home, LV_ALIGN_IN_TOP_LEFT, 0, 60);
-	lv_btn_set_action(btn_mv_retract, LV_BTN_ACTION_CLICK, cbMoveTab);
+	lv_obj_set_event_cb(btn_mv_retract, cbMoveTab);
 
 	btn_mv_load = lv_btn_create(tab, btn_mv_retract);
 	lv_obj_align(btn_mv_load, btn_mv_retract, LV_ALIGN_IN_TOP_LEFT, 0, 60);
-	lv_btn_set_action(btn_mv_load, LV_BTN_ACTION_CLICK, cbMoveTab);
+	lv_obj_set_event_cb(btn_mv_load, cbMoveTab);
 
 	lv_obj_t *txt = lv_label_create(btn_mv_home, NULL);
-	lv_label_set_text(txt, SYMBOL_HOME);
+	lv_label_set_text(txt, LV_SYMBOL_HOME);
 	txt = lv_label_create(btn_mv_retract, NULL);
-	lv_label_set_text(txt, SYMBOL_UPLOAD);
+	lv_label_set_text(txt, LV_SYMBOL_UPLOAD);
 	txt = lv_label_create(btn_mv_load, NULL);
-	lv_label_set_text(txt, SYMBOL_DOWNLOAD);
+	lv_label_set_text(txt, LV_SYMBOL_DOWNLOAD);
 
 
 
 	// X/Y/Z/E Buttons
 
 	btn_mv_x = lv_btn_create(tab, NULL);
-	lv_btn_set_fit (btn_mv_x, false, false);
+	lv_btn_set_fit (btn_mv_x, LV_FIT_NONE);
 	lv_obj_set_size(btn_mv_x, 70, 40);
 	lv_obj_align(btn_mv_x, btn_mv_home, LV_ALIGN_IN_TOP_LEFT, 77, 0);
 	lv_btn_set_toggle(btn_mv_x, true);
 	lv_btn_set_state(btn_mv_x, LV_BTN_STATE_REL);
-	lv_btn_set_action(btn_mv_x, LV_BTN_ACTION_CLICK, cbMoveTab);
+	lv_obj_set_event_cb(btn_mv_x, cbMoveTab);
 
 	btn_mv_y = lv_btn_create(tab, btn_mv_x);
 	lv_obj_align(btn_mv_y, btn_mv_x, LV_ALIGN_IN_TOP_LEFT, 0, 45);
@@ -477,7 +480,10 @@ void initMoveTab(lv_obj_t *tab) {
 	lv_label_set_text(txt, "+");
 }
 
-static lv_res_t cbTemperatureTab(lv_obj_t * btn) {
+static void cbTemperatureTab(lv_obj_t * btn, lv_event_t event) {
+	if (event != LV_EVENT_CLICKED) {
+		return;
+	}
 	if (btn == btn_temp_tool_pre) {
 		cmdSetToolTemp(220);
 	} else if (btn == btn_temp_tool_off) {
@@ -496,7 +502,7 @@ static lv_res_t cbTemperatureTab(lv_obj_t * btn) {
 		cmdSetBedTemp((uint16_t)tempBedTarget-1);
 	}
 
-	return LV_RES_OK;
+	return;
 }
 
 
@@ -514,10 +520,10 @@ void initTemperatureTab(lv_obj_t *tab) {
 	lv_label_set_text(lbl_temp_tool, "000 / 000");
 
 	btn_temp_tool_pre = lv_btn_create(tab, NULL);
-	lv_btn_set_fit (btn_temp_tool_pre, false, false);
+	lv_btn_set_fit (btn_temp_tool_pre, LV_FIT_NONE);
 	lv_obj_set_size(btn_temp_tool_pre, 70, 40);
 	lv_obj_set_pos(btn_temp_tool_pre, 0, TAB_START_Y+40);
-	lv_btn_set_action(btn_temp_tool_pre, LV_BTN_ACTION_CLICK, cbTemperatureTab);
+	lv_obj_set_event_cb(btn_temp_tool_pre, cbTemperatureTab);
 
 	btn_temp_tool_off = lv_btn_create(tab, btn_temp_tool_pre);
 	lv_obj_align(btn_temp_tool_off, btn_temp_tool_pre, LV_ALIGN_IN_TOP_LEFT, 77, 0);
@@ -573,33 +579,6 @@ void initTemperatureTab(lv_obj_t *tab) {
 	txt = lv_label_create(btn_temp_bed_minus, NULL);
 	lv_label_set_text(txt, "-1");
 }
-/*
-void updateFilenames() {
-	char buf[MAX_FILENAME_LEN+2];
-	for (int i=0; i<FILE_ROWS; i++) {
-		snprintf(buf, MAX_FILENAME_LEN+2, "\206%s", filenames[i]);
-		strcpy(file_button_map[i*3], buf);
-	}
-}*/
-
-/*Called when a button is released ot long pressed
-static lv_res_t file_btnm_action(lv_obj_t * btnm, const char *txt)
-{
-	if (!strcmp(txt, SYMBOL_UP)) { // UP
-
-	} else if (!strcmp(txt, SYMBOL_DOWN)) { // DOWN
-
-	} else {
-		for (int i=0; i<FILE_ROWS; i++) {
-			if (!strcmp(txt, filenames[i])) {
-				cmdSelectFolderEntry(folder_pos+i);
-				break;
-			}
-		}
-	}
-
-    return LV_RES_OK;
-}*/
 
 lv_obj_t* getFilenameLabel(uint8_t no) {
 	if (no < FILE_ROWS) {
@@ -621,7 +600,10 @@ void setFilename(uint8_t no, char* name) {
 
 
 
-static lv_res_t cbFileTab(lv_obj_t * btn) {
+static void cbFileTab(lv_obj_t * btn, lv_event_t event) {
+	if (event != LV_EVENT_CLICKED) {
+		return;
+	}
 	if (btn == btn_file_up) {
 		if (folder_pos > 0) {
 			// move files down
@@ -664,7 +646,7 @@ static lv_res_t cbFileTab(lv_obj_t * btn) {
 			}
 		}
 	}
-	return LV_RES_OK;
+	return;
 }
 
 
@@ -676,33 +658,32 @@ void initFileTab(lv_obj_t * tab) {
 	lv_obj_align(btn_file_up, lbl_files_folder, LV_ALIGN_IN_TOP_LEFT, 0, 30);
 	lv_obj_set_size(btn_file_up, 60, 60);
 	lv_obj_t * l = lv_label_create(btn_file_up, NULL);
-	lv_label_set_text(l, SYMBOL_UP);
-	lv_btn_set_action(btn_file_up, LV_BTN_ACTION_CLICK, cbFileTab);
+	lv_label_set_text(l, LV_SYMBOL_UP);
+	lv_obj_set_event_cb(btn_file_up, cbFileTab);
 
 	btn_file_down = lv_btn_create(tab, btn_file_up);
 	lv_obj_align(btn_file_down, btn_file_up, LV_ALIGN_IN_TOP_LEFT, 0, 4*35-1-60);
 	l = lv_label_create(btn_file_down, NULL);
-	lv_label_set_text(l, SYMBOL_DOWN);
-//
+	lv_label_set_text(l, LV_SYMBOL_DOWN);
 
 	for (int i=0; i<FILE_ROWS; i++) {
 		if (i == 0) {
 			btn_file[i] = lv_btn_create(tab, NULL);
 			lv_obj_align(btn_file[i], btn_file_up, LV_ALIGN_IN_TOP_LEFT, 70, 0);
 			lv_obj_set_size(btn_file[i], 230, 33);
-			lv_style_t * st = lv_btn_get_style(btn_file[i], LV_BTN_STYLE_REL);
+			const lv_style_t * st = lv_btn_get_style(btn_file[i], LV_BTN_STYLE_REL);
 			lv_style_copy(&file_style, st);
 			file_style.body.main_color = LV_COLOR_MAKE(0xCC, 0xCC, 0xFF);
 			file_style.body.grad_color = LV_COLOR_MAKE(0xCC, 0xCC, 0xFF);
 			file_style.text.color = LV_COLOR_MAKE(0x11, 0x11, 0x11);
 			lv_btn_set_style(btn_file[i], LV_BTN_STYLE_REL, &file_style);
-			lv_btn_set_action(btn_file[i], LV_BTN_ACTION_CLICK, cbFileTab);
+			lv_obj_set_event_cb(btn_file[i], cbFileTab);
 		} else {
 			btn_file[i] = lv_btn_create(tab, btn_file[0]);
 			lv_obj_align(btn_file[i], btn_file[i-1], LV_ALIGN_IN_TOP_LEFT, 0, 35);
 		}
 		lv_obj_t * lbl = lv_label_create(btn_file[i], NULL);
-		lv_label_set_long_mode(lbl, LV_LABEL_LONG_ROLL);
+		lv_label_set_long_mode(lbl, LV_LABEL_LONG_SROLL);
 		lv_obj_set_width(lbl, 220);
 		lv_label_set_align(lbl, LV_LABEL_ALIGN_LEFT);
 		lv_label_set_text(lbl, "n/a");
@@ -713,11 +694,11 @@ void initFileTab(lv_obj_t * tab) {
 
 void initScreens() {
 	lv_theme_t * th = lv_theme_material_init(240, NULL);
-	lv_style_t * s = th->btn.pr;
+	lv_style_t * s = th->style.btn.pr;
 	s->body.main_color = LV_COLOR_MAKE(0x00, 0x00, 0x55);
 	s->body.grad_color = LV_COLOR_MAKE(0x00, 0x00, 0x33);
 	s->text.color = LV_COLOR_MAKE(0xbb, 0xd5, 0xf1);
-	s = th->btn.tgl_rel;
+	s = th->style.btn.tgl_rel;
 	s->body.main_color = LV_COLOR_MAKE(0x00, 0x00, 0x55);
 	s->body.grad_color = LV_COLOR_MAKE(0x00, 0x00, 0x33);
 	s->text.color = LV_COLOR_MAKE(0xbb, 0xd5, 0xf1);
@@ -731,7 +712,7 @@ void initScreens() {
 	lv_obj_t *tabs[TAB_COUNT];
 	for (int i=0; i<TAB_COUNT; i++) {
 		tabs[i] = lv_tabview_add_tab(tabview, tab_names[i]);
-		lv_page_set_scrl_fit(tabs[i], false, false);
+		lv_page_set_scrl_fit(tabs[i], LV_FIT_NONE);
 		lv_page_set_scrl_width(tabs[i], 304);
 		lv_page_set_scrl_height(tabs[i], 180);
 	}
@@ -858,7 +839,7 @@ void updateStatusText() {
 
 void setProgress(float p) {
 	if (bar_hm_progress != NULL) {
-		lv_bar_set_value(bar_hm_progress, p);
+		lv_bar_set_value(bar_hm_progress, p, LV_ANIM_OFF);
 	}
 }
 
@@ -895,7 +876,7 @@ void setStatus(char* status) {
 		currentPrintTime = 0;
 		currentPrintTimeLeft = 0;
 		if (bar_hm_progress != NULL) {
-			lv_bar_set_value(bar_hm_progress, 0);
+			lv_bar_set_value(bar_hm_progress, 0, LV_ANIM_OFF);
 		}
 	}
 
