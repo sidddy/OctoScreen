@@ -269,10 +269,10 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  * #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(my_font_1) \
  *                                LV_FONT_DECLARE(my_font_2)
  */
-#define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(roboto_condensed_18)
+#define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(roboto_condensed_20)
 
 /*Always set a default font from the built-in fonts*/
-#define LV_FONT_DEFAULT        &roboto_condensed_18
+#define LV_FONT_DEFAULT        &roboto_condensed_20
 
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_font_user_data_t;
