@@ -118,7 +118,9 @@ lv_obj_t * lbl_temp_bed;
 
 // File Tab
 
-lv_style_t file_style;
+lv_style_t default_file_style;
+lv_style_t success_file_style;
+lv_style_t error_file_style;
 lv_obj_t * lbl_files_folder;
 
 #define FILE_ROWS 4
@@ -598,6 +600,15 @@ lv_obj_t* getFilenameLabel(uint8_t no) {
 void setFilename(uint8_t no, char* name) {
 	lv_obj_t* lbl = getFilenameLabel(no);
 	if (lbl != NULL) {
+		if (!strncmp(name, "[+]", 3)) {
+			name = name + 3;
+			lv_label_set_style(lbl, LV_LABEL_STYLE_MAIN, &success_file_style);
+		} else if (!strncmp(name, "[-]", 3)) {
+			name = name + 3;
+			lv_label_set_style(lbl, LV_LABEL_STYLE_MAIN, &error_file_style);
+		} else {
+			lv_label_set_style(lbl, LV_LABEL_STYLE_MAIN, &default_file_style);
+		}
 		lv_label_set_text(lbl, name);
 	}
 }
@@ -613,8 +624,11 @@ static void cbFileTab(lv_obj_t * btn, lv_event_t event) {
 			// move files down
 			for (int i=FILE_ROWS-1; i>0; i--) {
 				lv_obj_t* src = getFilenameLabel(i-1);
-				if (src != NULL) {
-					setFilename(i, lv_label_get_text(src));
+				lv_obj_t* dst = getFilenameLabel(i);
+
+				if ((src != NULL) && (dst != NULL)) {
+					lv_label_set_text(dst, lv_label_get_text(src));
+					lv_label_set_style(dst, LV_LABEL_STYLE_MAIN, lv_label_get_style(src, LV_LABEL_STYLE_MAIN));
 				}
 			}
 			setFilename(0, "");
@@ -630,8 +644,11 @@ static void cbFileTab(lv_obj_t * btn, lv_event_t event) {
 			// move files up
 			for (int i=0; i<FILE_ROWS-1; i++) {
 				lv_obj_t* src = getFilenameLabel(i+1);
-				if (src != NULL) {
-					setFilename(i, lv_label_get_text(src));
+				lv_obj_t* dst = getFilenameLabel(i);
+
+				if ((src != NULL) && (dst != NULL)) {
+					lv_label_set_text(dst, lv_label_get_text(src));
+					lv_label_set_style(dst, LV_LABEL_STYLE_MAIN, lv_label_get_style(src, LV_LABEL_STYLE_MAIN));
 				}
 			}
 			setFilename(FILE_ROWS-1, "");
@@ -676,11 +693,12 @@ void initFileTab(lv_obj_t * tab) {
 			lv_obj_align(btn_file[i], btn_file_up, LV_ALIGN_IN_TOP_LEFT, 70, 0);
 			lv_obj_set_size(btn_file[i], 230, 33);
 			const lv_style_t * st = lv_btn_get_style(btn_file[i], LV_BTN_STYLE_REL);
-			lv_style_copy(&file_style, st);
-			file_style.body.main_color = LV_COLOR_MAKE(0xCC, 0xCC, 0xFF);
-			file_style.body.grad_color = LV_COLOR_MAKE(0xCC, 0xCC, 0xFF);
-			file_style.text.color = LV_COLOR_MAKE(0x11, 0x11, 0x11);
-			lv_btn_set_style(btn_file[i], LV_BTN_STYLE_REL, &file_style);
+
+			lv_style_copy(&default_file_style, st);
+			default_file_style.body.main_color = LV_COLOR_MAKE(0xCC, 0xCC, 0xFF);
+			default_file_style.body.grad_color = LV_COLOR_MAKE(0xCC, 0xCC, 0xFF);
+			default_file_style.text.color = LV_COLOR_MAKE(0x11, 0x11, 0x11);
+			lv_btn_set_style(btn_file[i], LV_BTN_STYLE_REL, &default_file_style);
 			lv_obj_set_event_cb(btn_file[i], cbFileTab);
 		} else {
 			btn_file[i] = lv_btn_create(tab, btn_file[0]);
@@ -693,7 +711,11 @@ void initFileTab(lv_obj_t * tab) {
 		lv_label_set_text(lbl, "n/a");
 	}
 
+	lv_style_copy(&success_file_style, &default_file_style);
+	success_file_style.text.color = LV_COLOR_MAKE(0x22, 0xBB, 0x00);
 
+	lv_style_copy(&error_file_style, &default_file_style);
+	error_file_style.text.color = LV_COLOR_MAKE(0xFF, 0x00, 0x00);
 }
 
 void initScreens() {
