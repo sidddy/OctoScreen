@@ -29,6 +29,10 @@
 #define STATE_RESUMING 8
 #define STATE_UNKNOWN 255
 
+#define MY_SYMBOL_UP     "\xEF\x84\x82"
+#define MY_SYMBOL_DOWN   "\xEF\x84\x83"
+
+
 
 typedef struct {
 	uint8_t id;
@@ -409,9 +413,9 @@ void initMoveTab(lv_obj_t *tab) {
 	lv_obj_t *txt = lv_label_create(btn_mv_home, NULL);
 	lv_label_set_text(txt, LV_SYMBOL_HOME);
 	txt = lv_label_create(btn_mv_retract, NULL);
-	lv_label_set_text(txt, LV_SYMBOL_UPLOAD);
+	lv_label_set_text(txt, "E "MY_SYMBOL_UP);
 	txt = lv_label_create(btn_mv_load, NULL);
-	lv_label_set_text(txt, LV_SYMBOL_DOWNLOAD);
+	lv_label_set_text(txt, "E "MY_SYMBOL_DOWN);
 
 
 
