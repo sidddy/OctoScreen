@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define TAB_START_X 10
 #define TAB_START_Y 5
@@ -121,7 +122,11 @@ lv_obj_t * lbl_temp_bed;
 lv_style_t default_file_style;
 lv_style_t success_file_style;
 lv_style_t error_file_style;
+lv_style_t files_line_style;
 lv_obj_t * lbl_files_folder;
+lv_obj_t * line_files_indicator;
+#define FILE_INDICATOR_MAX 135
+lv_point_t points_files_indicator[2] = { {0, 0}, {0, FILE_INDICATOR_MAX} };
 
 #define FILE_ROWS 4
 
@@ -613,53 +618,77 @@ void setFilename(uint8_t no, char* name) {
 	}
 }
 
+static void updateFilesIndicator() {
+	if (folder_max > 0) {
+		points_files_indicator[0].x = 0;
+		points_files_indicator[0].y = trunc((double)FILE_INDICATOR_MAX*((double)folder_pos/(double)folder_max));
+		points_files_indicator[1].x = 0;
+		points_files_indicator[1].y = trunc((double)FILE_INDICATOR_MAX*((double)(folder_pos+FILE_ROWS)/(double)folder_max));
+		if (points_files_indicator[1].y > FILE_INDICATOR_MAX) {
+			points_files_indicator[1].y = FILE_INDICATOR_MAX;
+		}
+	} else {
+		points_files_indicator[0].x = 0;
+		points_files_indicator[0].y = 0;
+		points_files_indicator[1].x = 0;
+		points_files_indicator[1].y = FILE_INDICATOR_MAX;
+	}
+	lv_line_set_points(line_files_indicator, points_files_indicator, 2);
+}
 
 
 static void cbFileTab(lv_obj_t * btn, lv_event_t event) {
-	if (event != LV_EVENT_CLICKED) {
-		return;
+	if ((event == LV_EVENT_CLICKED) ||
+		(event == LV_EVENT_LONG_PRESSED) ||
+		(event == LV_EVENT_LONG_PRESSED_REPEAT)) {
+
+		if (btn == btn_file_up) {
+			if (folder_pos > 0) {
+				// move files down
+				for (int i=FILE_ROWS-1; i>0; i--) {
+					lv_obj_t* src = getFilenameLabel(i-1);
+					lv_obj_t* dst = getFilenameLabel(i);
+
+					if ((src != NULL) && (dst != NULL)) {
+						lv_label_set_text(dst, lv_label_get_text(src));
+						lv_label_set_style(dst, LV_LABEL_STYLE_MAIN, lv_label_get_style(src, LV_LABEL_STYLE_MAIN));
+					}
+				}
+				setFilename(0, "");
+				folder_pos--;
+				lv_btn_set_state(btn_file_down, LV_BTN_STATE_REL);
+				if (folder_pos == 0) {
+					lv_btn_set_state(btn_file_up, LV_BTN_STATE_INA);
+				}
+				cmdGetFolderEntries(folder_pos, folder_pos);
+				updateFilesIndicator();
+			}
+			return;
+		} else if (btn == btn_file_down) {
+			if (folder_pos < folder_max-FILE_ROWS) {
+				// move files up
+				for (int i=0; i<FILE_ROWS-1; i++) {
+					lv_obj_t* src = getFilenameLabel(i+1);
+					lv_obj_t* dst = getFilenameLabel(i);
+
+					if ((src != NULL) && (dst != NULL)) {
+						lv_label_set_text(dst, lv_label_get_text(src));
+						lv_label_set_style(dst, LV_LABEL_STYLE_MAIN, lv_label_get_style(src, LV_LABEL_STYLE_MAIN));
+					}
+				}
+				setFilename(FILE_ROWS-1, "");
+				folder_pos++;
+				lv_btn_set_state(btn_file_up, LV_BTN_STATE_REL);
+				if (folder_pos == folder_max-FILE_ROWS) {
+					lv_btn_set_state(btn_file_down, LV_BTN_STATE_INA);
+				}
+				cmdGetFolderEntries(folder_pos+FILE_ROWS-1, folder_pos+FILE_ROWS-1);
+				updateFilesIndicator();
+			}
+			return;
+		}
 	}
-	if (btn == btn_file_up) {
-		if (folder_pos > 0) {
-			// move files down
-			for (int i=FILE_ROWS-1; i>0; i--) {
-				lv_obj_t* src = getFilenameLabel(i-1);
-				lv_obj_t* dst = getFilenameLabel(i);
-
-				if ((src != NULL) && (dst != NULL)) {
-					lv_label_set_text(dst, lv_label_get_text(src));
-					lv_label_set_style(dst, LV_LABEL_STYLE_MAIN, lv_label_get_style(src, LV_LABEL_STYLE_MAIN));
-				}
-			}
-			setFilename(0, "");
-			folder_pos--;
-			lv_btn_set_state(btn_file_down, LV_BTN_STATE_REL);
-			if (folder_pos == 0) {
-				lv_btn_set_state(btn_file_up, LV_BTN_STATE_INA);
-			}
-			cmdGetFolderEntries(folder_pos, folder_pos);
-		}
-	} else if (btn == btn_file_down) {
-		if (folder_pos < folder_max-FILE_ROWS) {
-			// move files up
-			for (int i=0; i<FILE_ROWS-1; i++) {
-				lv_obj_t* src = getFilenameLabel(i+1);
-				lv_obj_t* dst = getFilenameLabel(i);
-
-				if ((src != NULL) && (dst != NULL)) {
-					lv_label_set_text(dst, lv_label_get_text(src));
-					lv_label_set_style(dst, LV_LABEL_STYLE_MAIN, lv_label_get_style(src, LV_LABEL_STYLE_MAIN));
-				}
-			}
-			setFilename(FILE_ROWS-1, "");
-			folder_pos++;
-			lv_btn_set_state(btn_file_up, LV_BTN_STATE_REL);
-			if (folder_pos == folder_max-FILE_ROWS) {
-				lv_btn_set_state(btn_file_down, LV_BTN_STATE_INA);
-			}
-			cmdGetFolderEntries(folder_pos+FILE_ROWS-1, folder_pos+FILE_ROWS-1);
-		}
-	} else {
+	if (event == LV_EVENT_CLICKED) {
 		for (int i=0; i<FILE_ROWS; i++) {
 			if (btn == btn_file[i]) {
 				cmdSelectFolderEntry(folder_pos+i);
@@ -667,7 +696,6 @@ static void cbFileTab(lv_obj_t * btn, lv_event_t event) {
 			}
 		}
 	}
-	return;
 }
 
 
@@ -691,7 +719,7 @@ void initFileTab(lv_obj_t * tab) {
 		if (i == 0) {
 			btn_file[i] = lv_btn_create(tab, NULL);
 			lv_obj_align(btn_file[i], btn_file_up, LV_ALIGN_IN_TOP_LEFT, 70, 0);
-			lv_obj_set_size(btn_file[i], 230, 33);
+			lv_obj_set_size(btn_file[i], 215, 33);
 			const lv_style_t * st = lv_btn_get_style(btn_file[i], LV_BTN_STYLE_REL);
 
 			lv_style_copy(&default_file_style, st);
@@ -706,7 +734,7 @@ void initFileTab(lv_obj_t * tab) {
 		}
 		lv_obj_t * lbl = lv_label_create(btn_file[i], NULL);
 		lv_label_set_long_mode(lbl, LV_LABEL_LONG_SROLL);
-		lv_obj_set_width(lbl, 220);
+		lv_obj_set_width(lbl, 205);
 		lv_label_set_align(lbl, LV_LABEL_ALIGN_LEFT);
 		lv_label_set_text(lbl, "n/a");
 	}
@@ -716,6 +744,16 @@ void initFileTab(lv_obj_t * tab) {
 
 	lv_style_copy(&error_file_style, &default_file_style);
 	error_file_style.text.color = LV_COLOR_MAKE(0xFF, 0x00, 0x00);
+
+    lv_style_copy(&files_line_style, &lv_style_plain);
+    files_line_style.line.color = LV_COLOR_MAKE(16, 24, 176);
+    files_line_style.line.width = 5;
+    files_line_style.line.rounded = 1;
+
+    line_files_indicator = lv_line_create(tab, NULL);
+    lv_line_set_points(line_files_indicator, points_files_indicator, 2);
+    lv_line_set_style(line_files_indicator, LV_LINE_STYLE_MAIN, &files_line_style);
+    lv_obj_align(line_files_indicator, btn_file[0], LV_ALIGN_IN_TOP_LEFT, lv_obj_get_width(btn_file[0])+5, 2);
 }
 
 void initScreens() {
@@ -963,6 +1001,7 @@ void setFolder(char* name) {
 	}
 	lv_btn_set_state(btn_file_down, LV_BTN_STATE_INA);
 	lv_btn_set_state(btn_file_up, LV_BTN_STATE_INA);
+	updateFilesIndicator();
 }
 
 void setFolderCount(uint16_t c) {
@@ -979,6 +1018,7 @@ void setFolderCount(uint16_t c) {
 	}
 	lv_btn_set_state(btn_file_up, LV_BTN_STATE_INA);
 	cmdGetFolderEntries(0, to);
+	updateFilesIndicator();
 }
 
 void setFolderEntry(uint16_t no, char* name) {

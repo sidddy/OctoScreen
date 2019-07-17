@@ -117,7 +117,7 @@ typedef int16_t lv_coord_t;
 
 /* Repeated trigger period in long press [ms]
  * Time between `LV_EVENT_LONG_PRESSED_REPEAT */
-#define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
+#define LV_INDEV_DEF_LONG_PRESS_REP_TIME  250
 
 /*==================
  * Feature usage
@@ -392,7 +392,7 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_LED      1
 
 /*Line (dependencies: -*/
-#define LV_USE_LINE     0
+#define LV_USE_LINE     1
 
 /*List (dependencies: lv_page, lv_btn, lv_label, (lv_img optionally for icons ))*/
 #define LV_USE_LIST     0
