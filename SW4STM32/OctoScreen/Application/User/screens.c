@@ -71,6 +71,9 @@ LV_IMG_DECLARE(z_height_img);
 #define TAB_COUNT 4
 char *tab_names[4] = { LV_SYMBOL_HOME, LV_SYMBOL_LOOP, "°C", LV_SYMBOL_LIST };
 
+// Calibration screen
+lv_obj_t * lbl_cal_status;
+
 // Home Buttons & Labels
 lv_obj_t * lbl_hm_temp_tool;
 lv_obj_t * lbl_hm_temp_bed;
@@ -138,31 +141,31 @@ lv_obj_t * btn_file_up;
 lv_obj_t * btn_file_down;
 
 
-void calibrationScreen() {
+void calibrationScreen(lv_obj_t* screen) {
 #define LEDSIZE 20
 	uint16_t calA[2] = {20,20};
 	uint16_t calB[2] = {300,100};
 	uint16_t calC[2] = {20,220};
 
-	lv_obj_t * led1  = lv_led_create(lv_scr_act(), NULL);
+	lv_obj_t * led1  = lv_led_create(screen, NULL);
 	lv_obj_set_size(led1, LEDSIZE, LEDSIZE);
 	lv_obj_set_x(led1, calA[0] - LEDSIZE/2);
 	lv_obj_set_y(led1, calA[1] - LEDSIZE/2);
 
-	lv_obj_t * led2  = lv_led_create(lv_scr_act(), NULL);
+	lv_obj_t * led2  = lv_led_create(screen, NULL);
 	lv_obj_set_size(led2, LEDSIZE, LEDSIZE);
 	lv_obj_set_x(led2, calB[0] - LEDSIZE/2);
 	lv_obj_set_y(led2, calB[1] - LEDSIZE/2);
 
-	lv_obj_t * led3  = lv_led_create(lv_scr_act(), NULL);
+	lv_obj_t * led3  = lv_led_create(screen, NULL);
 	lv_obj_set_size(led3, LEDSIZE, LEDSIZE);
 	lv_obj_set_x(led3, calC[0] - LEDSIZE/2);
 	lv_obj_set_y(led3, calC[1] - LEDSIZE/2);
 
 	lv_led_on(led1);
-	lbl_hm_status = lv_label_create(lv_scr_act(), NULL);
-	lv_obj_set_pos(lbl_hm_status, 100, 100);
-	lv_label_set_text(lbl_hm_status, "n/a");
+	lbl_cal_status = lv_label_create(screen, NULL);
+	lv_obj_set_pos(lbl_cal_status, 10, 100);
+	lv_label_set_text(lbl_cal_status, "n/a");
 }
 
 
@@ -198,9 +201,12 @@ static void cbHomeTab(lv_obj_t * btn, lv_event_t event) {
 static void cbHomeTabPauseMBox(lv_obj_t * obj, lv_event_t event)
 {
 	if (event == LV_EVENT_CLICKED) {
-		lv_obj_set_hidden(mbox_hm_pause, true);
-		if (!strcmp(lv_mbox_get_active_btn_text(obj), "Yes")) {
+		const char* clicked = lv_mbox_get_active_btn_text(obj);
+		if (!strcmp(clicked, "Yes")) {
 			cmdPause();
+			lv_obj_set_hidden(mbox_hm_pause, true);
+		} else if (!strcmp(clicked, "No")) {
+			lv_obj_set_hidden(mbox_hm_pause, true);
 		}
 	}
 }
@@ -208,9 +214,12 @@ static void cbHomeTabPauseMBox(lv_obj_t * obj, lv_event_t event)
 static void cbHomeTabCancelMBox(lv_obj_t * obj, lv_event_t event)
 {
 	if (event == LV_EVENT_CLICKED) {
-		lv_obj_set_hidden(mbox_hm_cancel, true);
-		if (!strcmp(lv_mbox_get_active_btn_text(obj), "Yes")) {
+		const char* clicked = lv_mbox_get_active_btn_text(obj);
+		if (!strcmp(clicked, "Yes")) {
 			cmdCancel();
+			lv_obj_set_hidden(mbox_hm_cancel, true);
+		} else if (!strcmp(clicked, "No")) {
+			lv_obj_set_hidden(mbox_hm_cancel, true);
 		}
 	}
 }
@@ -286,7 +295,7 @@ void initHomeTab(lv_obj_t *tab) {
 	lv_obj_set_event_cb(btn_hm_2, cbHomeTab);
 
 
-	static const char * btns[] ={"\221Yes", "\221No", ""};
+	static const char * btns[] = {"Yes", "No", ""};
 
 
 	mbox_hm_pause = lv_mbox_create(tab, NULL);
@@ -521,10 +530,6 @@ void initTemperatureTab(lv_obj_t *tab) {
 	lv_obj_t * img = lv_img_create(tab,NULL);
 	lv_img_set_src(img, &nozzle_img);
 	lv_obj_set_pos(img, 10, TAB_START_Y);
-
-	/*lv_obj_t *txt = lv_label_create(tab, NULL);
-	lv_obj_set_pos(txt, 0, TAB_START_Y);
-	lv_label_set_text(txt, "Tool");*/
 
 	lbl_temp_tool = lv_label_create(tab, NULL);
 	lv_obj_align(lbl_temp_tool, img, LV_ALIGN_IN_TOP_LEFT, 100, 10);
@@ -768,7 +773,12 @@ void initScreens() {
 	s->text.color = LV_COLOR_MAKE(0xbb, 0xd5, 0xf1);
 	lv_theme_set_current(th);
 
+	lv_obj_t * main_scr  = lv_obj_create(NULL, NULL);
+
+	lv_scr_load(main_scr);
+
 	lv_obj_t *tabview;
+
 	tabview = lv_tabview_create(lv_scr_act(), NULL);
 	lv_tabview_set_sliding(tabview, false);
 	lv_tabview_set_anim_time(tabview, 300);
@@ -789,12 +799,16 @@ void initScreens() {
 	setFolder("");
 	setStatus("");
 
+	// Touch screen calibration
+	lv_obj_t * cal_scr  = lv_obj_create(NULL, NULL);
+	calibrationScreen(cal_scr);
+	//lv_scr_load(cal_scr);
+
 	return;
 }
 
-void setMessage(char* msg) {
-	return;
-	lv_label_set_text(lbl_hm_status, msg);
+void setCalMessage(char* msg) {
+	lv_label_set_text(lbl_cal_status, msg);
 }
 
 void resetTempBedLabel() {

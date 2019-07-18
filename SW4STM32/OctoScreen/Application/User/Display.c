@@ -7,7 +7,7 @@
 #include "Display.h"
 
 #include "UTFT.h"
-#include "UTouch.h"
+#include "xpt2046.h"
 #include "cmsis_os.h"
 #include "lvgl/lvgl.h"
 
@@ -45,7 +45,7 @@ void flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t * color_p) {
 bool touch_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
 {
 	uint16_t x,y,z;
-	if (Touch_Get_Filtered_Data(&x, &y, &z)) {
+	if (XPT2046_Touch_Get_Data(&x, &y, &z)) {
 		data->point.x = x;
 		data->point.y = y;
 		data->state = LV_INDEV_STATE_PR;

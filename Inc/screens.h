@@ -10,7 +10,7 @@
 
 void initScreens();
 
-void setMessage(char* msg);
+void setCalMessage(char* msg);
 
 void setTempBedActual(float val);
 void setTempBedTarget(float val);

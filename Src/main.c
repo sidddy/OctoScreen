@@ -55,7 +55,7 @@
 #include "Display.h"
 #include "screens.h"
 #include "lvgl/lvgl.h"
-#include "UTouch.h"
+#include "xpt2046.h"
 #include "DMA_CIRCULAR.h"
 #include "serialCommands.h"
 
@@ -166,7 +166,7 @@ int main(void)
   HAL_Delay(1000);
 
   initDisplay();
-  Touch_Init(320,240);
+  XPT2046_Touch_Init(320,240);
   initScreens();
   //bing();
 
@@ -558,9 +558,6 @@ void StartDefaultTask(void const * argument)
 	  osDelay(1);
 	  if (cnt % 5 == 0) {
 		  lv_task_handler();
-	/*	  char buf[64];
-		  snprintf(buf,64,"%d",cnt);
-		  		  setMessage(buf);*/
 	  }
 	  if (cnt % 2500 == 0) {
 	  	rotateLabels();
@@ -570,11 +567,20 @@ void StartDefaultTask(void const * argument)
 		  init_sent = 1;
 	  }
 
-	 /* uint16_t x,y,z;
-	  if (Touch_Get_Filtered_Data(&x, &y, &z)) {
-		  char buf[64];
-		  snprintf(buf,64,"X=%d Y=%d Z=%d",x,y,z);
-		  setMessage(buf);
+	  //uint16_t x,y,z1,z2;
+
+	  // use for calibration
+	  /*XPT2046_Touch_Get_Raw_Data(&x, &y, &z1, &z2);
+	  char buf[64];
+	  if ((z1 > 150) || (2048-z2 > 150)) {
+		  snprintf(buf,64,"X=%d Y=%d Z1=%d Z2=%d",x,y,z1,z2);
+		  setCalMessage(buf);
+	  }*/
+	  // use for calibration validation
+	  /*char buf[64];
+	  if (XPT2046_Touch_Get_Data(&x, &y, &z1)) {
+		  snprintf(buf,64,"X=%d Y=%d Z=%d",x,y,z1);
+		  setCalMessage(buf);
 	  }*/
 
   }
