@@ -28,7 +28,6 @@ Flashing custom firmware to your MKS TFT requires to unlock the flash memory, wh
 ## Issues
 
 Known issues so far:
-- The precision of the touch recognition is... well... bad. Especially on the borders of the display, you'll sometimes need to push multiple times to properly press a button.
 - You'll probably need to re-calibrate the display driver for your specific display. There's some commented out debug coding to output the raw values from the display, so you can use these to update tha calibraton parameters.
 - The display sometimes freezes for unknown reasons. This seems to happen more frequently when there's bad WIFI reception for the OctoHub wifi dongle.
 
