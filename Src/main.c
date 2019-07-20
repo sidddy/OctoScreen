@@ -567,19 +567,19 @@ void StartDefaultTask(void const * argument)
 		  init_sent = 1;
 	  }
 
-	  //uint16_t x,y,z1,z2;
+	  //uint16_t x,y,z;
 
 	  // use for calibration
-	  /*XPT2046_Touch_Get_Raw_Data(&x, &y, &z1, &z2);
+	  /*XPT2046_Touch_Get_Raw_Data(&x, &y, &z);
 	  char buf[64];
-	  if ((z1 > 150) || (2048-z2 > 150)) {
-		  snprintf(buf,64,"X=%d Y=%d Z1=%d Z2=%d",x,y,z1,z2);
+	  if (z > 700) {
+		  snprintf(buf,64,"X=%d Y=%d Z=%d",x,y,z);
 		  setCalMessage(buf);
 	  }*/
 	  // use for calibration validation
 	  /*char buf[64];
-	  if (XPT2046_Touch_Get_Data(&x, &y, &z1)) {
-		  snprintf(buf,64,"X=%d Y=%d Z=%d",x,y,z1);
+	  if (XPT2046_Touch_Get_Data(&x, &y, &z)) {
+		  snprintf(buf,64,"X=%d Y=%d Z=%d",x,y,z);
 		  setCalMessage(buf);
 	  }*/
 
