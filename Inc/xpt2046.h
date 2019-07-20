@@ -14,7 +14,7 @@
 #define XPT2046_COOR_Z2 0x40
 
 void XPT2046_Touch_Init(uint16_t xp, uint16_t yp);
-void XPT2046_Touch_Get_Raw_Data(uint16_t* x, uint16_t* y, uint16_t* z1, uint16_t* z2);
+void XPT2046_Touch_Get_Raw_Data(uint16_t* x, uint16_t* y, uint16_t* z);
 bool XPT2046_Touch_Get_Data(uint16_t* x, uint16_t* y, uint16_t* z);
 
 #endif

@@ -143,9 +143,9 @@ lv_obj_t * btn_file_down;
 
 void calibrationScreen(lv_obj_t* screen) {
 #define LEDSIZE 20
-	uint16_t calA[2] = {20,20};
-	uint16_t calB[2] = {300,100};
-	uint16_t calC[2] = {20,220};
+	uint16_t calA[3] = {20,20,100};
+	uint16_t calB[3] = {300,100,100};
+	uint16_t calC[3] = {170,220,100};
 
 	lv_obj_t * led1  = lv_led_create(screen, NULL);
 	lv_obj_set_size(led1, LEDSIZE, LEDSIZE);
